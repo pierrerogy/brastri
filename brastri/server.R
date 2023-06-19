@@ -52,6 +52,14 @@ shinyServer(function(input, output) {
     emergence <-
       readr::read_csv(here::here("brastri", "data",
                                  "emergence_data.csv"))
+    
+    ## Table 1 with model outputs
+    table1 <-
+      read.csv(here::here("brastri", "data",
+                                 "table_1.csv"),
+               row.names = 1)
+    
+    ## Table 2 with model outputs
 
     # Make reactive datasets (subset data for each plot depending on selection) ---------------------------------------------------
     # Plot 1
@@ -202,6 +210,16 @@ shinyServer(function(input, output) {
       line4
       
     })
+    
+    # Table 1
+    output$table1 <- renderTable(
+      {table1}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  
+      digits = 3, 
+      sanitize.text.function=identity) ## last row to read <br> as line break
     
     
     

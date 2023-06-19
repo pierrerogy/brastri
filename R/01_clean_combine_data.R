@@ -3,7 +3,7 @@
 # Load libraries
 library(tidyverse)
 library(here)
-source(here::here("brastri",,
+source(here::here("brastri",
                   "functions.R"))
 library(hellometry)
 
@@ -40,7 +40,7 @@ temp1 <-
   ## Add country, site and species column
   dplyr::mutate(country = "bras",
                 site = "regua",
-                species = "alcantarea_imperialis",
+                bromspecies = "alcantarea_imperialis",
                 distance_from_ground_cm = 0)
 
 # Clean Trini data
@@ -59,7 +59,8 @@ temp2 <-
   ## Rename columns and make new ones
   dplyr::rename(day = date_collected,
                 height_cm = height_mm,
-                width_cm = width_mm) %>% 
+                width_cm = width_mm,
+                bromspecies = species) %>% 
   dplyr::mutate(country = "trini") %>% 
   ## Get decomposition rates
   dplyr::mutate(prop_loss_coarse_dry = ifelse(is.na(busted_coarse),
@@ -94,7 +95,10 @@ temp2 <-
 # Combine data
 bromeliad_data <- 
   temp1 %>% 
-  dplyr::bind_rows(temp2)
+  dplyr::bind_rows(temp2) %>% 
+  ## changing factor level name to not to have to create a factor later on
+  dplyr::mutate(resource = ifelse(resource == "normal",
+                                  "control", "enriched"))
 
 # Explore data to confirm there is nothing wrong
 hist(bromeliad_data$height_cm)
@@ -193,7 +197,7 @@ water_data <-
                      dplyr::rename(temp_C = temperature_C)) %>% 
   ## Join treatments
   dplyr::left_join(bromeliad_data %>% 
-                     dplyr::select(country, bromeliad_id, predator, resource),
+                     dplyr::select(country, bromeliad_id, bromspecies, predator, resource),
                    by = c("country", "bromeliad_id"))
 
 # Explore data to confirm there is nothing wrong
@@ -270,7 +274,7 @@ community_data <-
   dplyr::bind_rows(temp2) %>% 
   ## Join treatments
   dplyr::left_join(bromeliad_data %>% 
-                     dplyr::select(country, bromeliad_id, predator, resource),
+                     dplyr::select(country, bromeliad_id, bromspecies, predator, resource),
                    by = c("country", "bromeliad_id")) %>% 
   ## Add a abundance of 1 at the beginning
   dplyr::mutate(n = ifelse(is.na(n), 
@@ -295,14 +299,14 @@ community_data <-
   hellometry::hello_metry()
 
 # Explore data to confirm there is nothing wrong
-hist(as.numeric(community_data$size_mm))
+hist(as.numeric(community_data$size_original))
 hist(community_data$dry_mass_mg) ## Think what to do with 0 values
-unique(community_data$Class)
-unique(community_data$Order)
-unique(community_data$Family)
-unique(community_data$Subfamily)
-unique(community_data$Genus)
-unique(community_data$Species)
+unique(community_data$class)
+unique(community_data$ord)
+unique(community_data$family)
+unique(community_data$subfamily)
+unique(community_data$genus)
+unique(community_data$species)
 
 ## Save data
 readr::write_csv(community_data,
@@ -356,24 +360,26 @@ emergence_data <-
   dplyr::bind_rows(temp2) %>% 
   ## Join treatments
   dplyr::left_join(bromeliad_data %>% 
-                     dplyr::select(country, bromeliad_id, predator, resource),
+                     dplyr::select(country, bromeliad_id, bromspecies, predator, resource),
                    by = c("country", "bromeliad_id"))
 # Explore data to confirm there is nothing wrong
 hist(as.numeric(emergence_data$length_mm)) ## Stupid conversion error on excel
 hist(community_data$dry_mass_mg) 
-hist(community_data$n)
-unique(community_data$Class)
-unique(community_data$Order)
-unique(community_data$Family)
-unique(community_data$Subfamily)
-unique(community_data$Genus)
-unique(community_data$Species)
+hist(emergence_data$n)
+unique(emergence_data$Class)
+unique(emergence_data$Order)
+unique(emergence_data$Family)
+unique(emergence_data$Subfamily)
+unique(emergence_data$Genus)
+unique(emergence_data$Species)
 
 # Fix data
 emergence_data <- 
   emergence_data %>% 
   dplyr::mutate(length_mm = ifelse(length_mm %in% c("44625", "44566"),
-                                   NA, length_mm))
+                                   NA, length_mm),
+                Species = ifelse(Species == "flly3",
+                                 "fly3", Species))
 
 ## Save data
 readr::write_csv(emergence_data,

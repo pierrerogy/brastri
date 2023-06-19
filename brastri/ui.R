@@ -242,9 +242,28 @@ shinyUI(navbarPage(
                       we consider as fully significant an association with both pd > 95% and 
                       % in ROPE < 5%, and as non-significant associations for which with one 
                       or no such cut-off are met."),
-              style = "display: inline-block; margin-left: 10px; margin-right: 10px;font-family: Sylfaen"))
-          ))
-        
+              style = "display: inline-block; margin-left: 10px; margin-right: 10px;font-family: Sylfaen")),
+          ## Second row has output table
+          fluidRow((column(width = 12,
+                           box(width = NULL, status = "primary",
+                               solidHeader = T, 
+                               title = "Table 1",
+                               tableOutput("table1"))))),
+          ## Third row has legend of table
+          fluidRow(h4(strong("Table 1. Model outputs"),
+                     style = "display: inline-block; margin-left: 5px; font-family: Sylfaen"),
+                  p(span(""))),
+          ## Fourth row has plot legend
+          fluidRow(h4(strong("Figure 2. Model outputs"),
+                      style = "display: inline-block; margin-left: 5px; font-family: Sylfaen"),
+                   p(span(""))),
+          ## Fifth row has figure 2
+          fluidRow(column(12, 
+                          div(img(src = "fig2.jpg",
+                                  height = "100%", width = "100%"), 
+                              style = "text-align: center;")))
         ))
+
+))
     
 

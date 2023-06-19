@@ -70,6 +70,22 @@ get_those_dats <- function(y = "none", x = "none",
       dplyr::rename(x = day)
   }
   
+  # Total phosphorus
+  if(y == "TP"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = total_p_ugL) %>%
+      dplyr::rename(x = day)
+  }
+  
+  # Phosphate ppm
+  if(y == "PPPM"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = phosphate_ppm) %>%
+      dplyr::rename(x = day)
+  }
+  
   # Return data
   return(ret)
   
@@ -111,13 +127,19 @@ axis_label <- function(parameter){
     ret <-
       expression(paste("[BR] Total P (", mu, "mol"*".L"^"-1"*") --- [TT] PO"["4"]^"3-"*" (ppm)"))
   
+  if(parameter == "TP")
+    ret <-
+      expression(paste("Total P (", mu, "mol"*".L"^"-1"*")"))
+  
+  if(parameter == "PPPM")
+    ret <-
+      expression(paste("PO"["4"]^"3-"*" (ppm)"))
+  
   # Return
   return(ret)
   
   
 }
-
-
 
 # Make density plot -------------------------------------------------------
 density_plot <- function(dats, x){
@@ -147,7 +169,6 @@ density_plot <- function(dats, x){
   return(ret)
   
 }
-
 
 # Make line plot ----------------------------------------------------------
 time_plot <- function(dats, y){
@@ -209,11 +230,115 @@ time_plot <- function(dats, y){
 }
 
 
+# Make treatment plot -----------------------------------------------------
+treatment_plot <- function(model, parameter, scale,
+                           bromeliads, communities, 
+                           water, emergence){
+  # Prepare data
+  ## Effect
+  model_effect <- 
+    brms::conditional_effects(model,
+                              method = "fitted")$`resource:predator`
+  ### Rescale
+  if(scale == "log"){
+    model_effect <- 
+      model_effect %>% 
+      dplyr::mutate(estimate__ = exp(estimate__),
+                    lower__ = exp(lower__),
+                    upper__ = exp(upper__))
+  }
+  if(scale == "sqrt"){
+    model_effect <- 
+      model_effect %>% 
+      dplyr::mutate(estimate__ = (estimate__)^2,
+                    lower__ = (lower__)^2,
+                    upper__ = (upper__)^2)
+  } 
+  ## Raw
+  dats <- 
+    get_those_dats(y = parameter,
+                   bromeliads = bromeliads, 
+                   communities = communities, 
+                   water = water, 
+                   emergence = emergence)
+
+  # Get axes label
+  ylab <- 
+    axis_label(parameter = parameter)
   
+  # Plot
+  ## Little catch for log scale of y axis
+  if(parameter == "Chlorophyll-a") {
+    ret <- 
+      ggplot(data = water,
+             aes(x = predator,
+                 y = y,
+                 colour = resource)) + 
+      geom_jitter(aes(alpha = 0.3)) +
+      geom_point(size = 3,
+                 data = model_effect,
+                 aes(x = predator, 
+                     y = estimate__,
+                     colour = resource), 
+                 position = position_dodge(0.5)) +
+      geom_errorbar(data = model_effect,
+                    aes(ymin = lower__, 
+                        ymax = upper__,
+                        colour = resource), 
+                    width = 0.2,
+                    position = position_dodge(0.5)) +
+    ggtitle("") +
+    xlab("Predator") +
+    scale_x_discrete(labels = c("Absent", "Present")) +
+    scale_y_continuous(trans = "log",
+                       breaks = c(0.01, 0.5, 1))+  
+    ylab(ylab) +
+      scale_color_manual(name = "Resource",
+                         labels = c("Control", "Enriched"), 
+                         values = c("tan1", "tan4")) +
+    guides(alpha="none") +
+    theme(panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(), 
+          axis.line = element_line(colour = "black"))} else
+    {ret <- 
+      ggplot(data = model_effect,
+             aes(x = predator, 
+                 y = estimate__), 
+             colour = resource) + 
+      geom_point(size = 4,
+                 aes(colour = resource),
+                 position = position_dodge(0.5)) +
+      geom_errorbar(aes(ymin = lower__, 
+                        ymax = upper__,
+                        colour = resource), 
+                    width = 0.2,
+                    position = position_dodge(0.5)) +
+      geom_jitter(data = dats,
+                 aes(x = predator,
+                     y = y,
+                     colour = resource,
+                     alpha = 0.3)) +
+      ggtitle("") +
+      xlab("Predator") +
+      scale_x_discrete(labels = c("Absent", "Present")) +
+      ylab(ylab) +
+      scale_color_manual(name = "Resource",
+                         labels = c("Control", "Enriched"), 
+                         values = c("tan1", "tan4")) +
+      guides(alpha="none") +
+      theme(panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(),
+            panel.background = element_blank(), 
+            axis.line = element_line(colour = "black"))}
+    
+    # Return 
+    return(ret)
+
+  }
 
 
 # Compute species name based on row taxonomy ------------------------------
-
 get_specnames <- function(df, short = FALSE){
   
   # List of possible taxa
@@ -272,7 +397,6 @@ get_specnames <- function(df, short = FALSE){
   return(df)
   
 }
-
 
 # Not in ------------------------------------------------------------------
 # Not in
