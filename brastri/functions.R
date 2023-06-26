@@ -86,6 +86,82 @@ get_those_dats <- function(y = "none", x = "none",
       dplyr::rename(x = day)
   }
   
+  # Coarse bag decomposition - dry
+  if(y == "coarse_dry"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = prop_loss_coarse_dry)
+  }
+  
+  # Fine bag decomposition - dry
+  if(y == "fine_dry"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = prop_loss_fine_dry)
+  }
+  
+  # Coarse bag decomposition - wet
+  if(y == "coarse_normal"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = prop_loss_coarse_normal)
+  }
+  
+  # Fine bag decomposition - wet
+  if(y == "fine_normal"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = prop_loss_fine_normal)
+  }
+  
+  # Scirtes
+  if(x == "Scirtes"){
+    ret <- 
+      communities %>% 
+      dplyr::filter(genus == "Scirtes") %>% 
+      dplyr::rename(x = size_original)
+  }
+  
+  # Tipulidae
+  if(x == "Tipulidae"){
+    ret <- 
+      communities %>% 
+      dplyr::filter(family == "Tipulidae") %>% 
+      dplyr::rename(x = size_original)
+  }
+  
+  # Polypedilum
+  if(x == "Polypedilum"){
+    ret <- 
+      communities %>% 
+      dplyr::filter(genus == "Polypedilum") %>% 
+      dplyr::rename(x = size_original)
+  }
+  
+  # Tanypodinae
+  if(x == "Tanypodinae"){
+    ret <- 
+      communities %>% 
+      dplyr::filter(subfamily == "Tanypodinae") %>% 
+      dplyr::rename(x = size_original)
+  }
+  
+  # Wyeomyia
+  if(x == "Wyeomyia"){
+    ret <- 
+      communities %>% 
+      dplyr::filter(genus == "Wyeomyia") %>% 
+      dplyr::rename(x = size_original)
+  }
+  
+  # Odonata
+  if(x == "Coenagrionidae"){
+    ret <- 
+      communities %>% 
+      dplyr::filter(ord == "Odonata") %>% 
+      dplyr::rename(x = size_original)
+  }
+  
   # Return data
   return(ret)
   
@@ -135,6 +211,22 @@ axis_label <- function(parameter){
     ret <-
       expression(paste("PO"["4"]^"3-"*" (ppm)"))
   
+  if(parameter == "coarse_dry")
+    ret <- 
+      "Mass loss proportion in coarse mesh bag (wet-dry)"
+  
+  if(parameter == "fine_dry")
+    ret <- 
+      "Mass loss proportion in fine mesh bag (wet-dry)"
+  
+  if(parameter == "coarse_normal")
+    ret <- 
+      "Mass loss proportion in coarse mesh bag (wet-wet)"
+  
+  if(parameter == "fine_normal")
+    ret <- 
+      "Mass loss proportion in fine mesh bag (wet-wet)"
+  
   # Return
   return(ret)
   
@@ -169,6 +261,43 @@ density_plot <- function(dats, x){
   return(ret)
   
 }
+
+
+# Make size histogram -----------------------------------------------------
+size_histogram <- function(dats, x){
+  
+  # Prepare dats to always have full histogram
+  dats <- 
+    prep_dats_hist(dats)
+  
+  # Make plot
+  ret <- 
+    ggplot(dats, 
+           aes(x = x)) + 
+    geom_density(fill = "darkgoldenrod1") +
+    facet_grid(cols = vars(when),
+               rows = vars(country), 
+               labeller = labeller(country = 
+                                     c("bras" = "BR",
+                                       "trini" = "TT"),
+                                   when = 
+                                     c("start" = "Beginning",
+                                       "end" = "End"))) +
+    ylab("Frequency") + 
+    xlab("") +
+    theme(axis.text.y = element_blank(),
+          axis.ticks.y = element_blank(),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(), 
+          axis.line = element_line(colour = "black")) 
+  
+  # Return plot
+  return(ret)
+  
+  
+}
+
 
 # Make line plot ----------------------------------------------------------
 time_plot <- function(dats, y){
@@ -214,8 +343,8 @@ time_plot <- function(dats, y){
                             labels = c("Absent", "Present"), 
                             values = c(1, 2)) +
     scale_colour_manual(name = "Resource",
-                          labels = c("Enriched", "Control"), 
-                          values = c("tan4", "tan1")) +
+                          labels = c("Control", "Enriched"), 
+                          values = c("tan1", "tan4")) +
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           panel.background = element_blank(), 
@@ -231,7 +360,7 @@ time_plot <- function(dats, y){
 
 
 # Make treatment plot -----------------------------------------------------
-treatment_plot <- function(model, parameter, scale,
+treatment_plot <- function(model, parameter, scale = "none",
                            bromeliads, communities, 
                            water, emergence){
   # Prepare data
@@ -403,4 +532,50 @@ get_specnames <- function(df, short = FALSE){
 `%notin%` <- 
   Negate(`%in%`)
 
+# Make table names nicer ---------------------------------------------------
+make_names_nicer <- function(table){
+  # Make table ret
+  ret <- 
+    table
+  
+  # Convert . to space and add line break
+  names(ret) <- 
+    names(ret) %>% 
+    stringr::str_replace_all(pattern = "\\.",
+                         replacement = " ") %>% 
+    stringr::str_replace(pattern = "x",
+                         replacement = "  x<br> ")
+  
+  # Add line break 
+  
+  
+  # Return
+  return(ret)
+  
+  
+  
+}
+
+
+
+# Prep data for histogram --------------------------------------------------
+prep_dats_hist <- function(dats){
+  
+  ret <- 
+    dats %>% 
+    dplyr::filter(!is.na(x)) %>% 
+    ## Select relevant columns and make empty rows
+    dplyr::select(country, when, x) %>% 
+    dplyr::bind_rows(tibble::tibble(country = c("trini", "trini", "bras", "bras"),
+                                    when = c("start", "end", "start", "end"),
+                                    x = rep(NA, 4))) %>%
+    ## Male size numeric, remove NAs
+    dplyr::mutate(when = factor(when, levels = c("start", "end")),
+                                x = as.numeric(x))
+  
+  ## Return
+  return(ret)
+  
+  
+}
 

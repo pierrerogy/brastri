@@ -14,7 +14,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(here)
-source(here::here("brastri",
+source(here::here(#"brastri",
                   "functions.R"))
 
 
@@ -24,16 +24,19 @@ shinyServer(function(input, output) {
     # Read in the prepared data 
     ## Bromeliads
     bromeliads <-
-      readr::read_csv(here::here("brastri", "data",
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
                                    "bromeliad_data.csv")) %>% 
       ## Keep experimental bromeliads only
-      dplyr::filter(stringr::str_detect(string = bromeliad_id, patter = "E")) %>% 
+      dplyr::filter(stringr::str_detect(string = bromeliad_id, 
+                                        pattern = "E")) %>% 
       ## Remove the columns not needed
       dplyr::select(-contains(c("_g", "prop", "actual", "site", "_mm")))
     
     ## Water chemistry
     water <-
-      readr::read_csv(here::here("brastri", "data",
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
                                  "water_data.csv")) %>% 
       ## Make day date
       dplyr::mutate(day = lubridate::dmy(day)) %>% 
@@ -41,25 +44,50 @@ shinyServer(function(input, output) {
       dplyr::filter(bromeliad_id != "tap")
     
     ## Aquatic communities
-    community <-
-      readr::read_csv(here::here("brastri", "data",
+    communities <-
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
                                  "community_data.csv")) %>% 
       ## Remove ci columns and convert biomass data
-      dplyr::mutate(dry_mass_mg = ifelse(is.na(dry_mass_mg),
-                                         biomass_mg, dry_mass_mg)) %>% 
-      dplyr::select(-contains("ci"), - biomass_mg, -size_used_mm, -bwg_name)
-
+      dplyr::select(-contains("ci"),  -size_used_mm, -bwg_name)
+    
+    ## Emergence
     emergence <-
-      readr::read_csv(here::here("brastri", "data",
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
                                  "emergence_data.csv"))
     
-    ## Table 1 with model outputs
+    ## Table 1 with model water chemistry outputs
     table1 <-
-      read.csv(here::here("brastri", "data",
-                                 "table_1.csv"),
-               row.names = 1)
-    
+      readr::read_csv(here::here(#"brastri", 
+                          "data",
+                                 "table_1.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+  
     ## Table 2 with model outputs
+    table2 <- 
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
+                                 "table_2.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    
+    ## Table 3 with number of individual seeded, caught as adult, number of larvae found
+    ### a
+    table3a <- 
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
+                                 "table_3a.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    ### b
+    table3b <- 
+      readr::read_csv(here::here(#"brastri", 
+                                 "data",
+                                 "table_3b.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
 
     # Make reactive datasets (subset data for each plot depending on selection) ---------------------------------------------------
     # Plot 1
@@ -113,7 +141,7 @@ shinyServer(function(input, output) {
       
         })
     
-    # Plot 3
+    # Plot 4
     plot4_dats <- reactive({
       
       ## Get data
@@ -129,8 +157,40 @@ shinyServer(function(input, output) {
       return(ret)
         })
     
+    # Plot 5
+    plot5_dats <- reactive({
+      
+      ## Get data
+      ret <- 
+        get_those_dats(
+          x = input$x5, 
+          bromeliads = bromeliads, 
+          communities = communities, 
+          water = water, 
+          emergence = emergence)
+      
+      ## Return data
+      return(ret)
+    })
     
-    # Make plots --------------------------------------------------------------
+    # Plot 6
+    plot6_dats <- reactive({
+      
+      ## Get data
+      ret <- 
+        get_those_dats(
+          x = input$x6, 
+          bromeliads = bromeliads, 
+          communities = communities, 
+          water = water, 
+          emergence = emergence)
+      
+      ## Return data
+      return(ret)
+    })
+    
+    
+    # Make plots and tables --------------------------------------------------------------
     # Plot 1
     output$plot1 <- renderPlot({
         density1 <-
@@ -211,6 +271,44 @@ shinyServer(function(input, output) {
       
     })
     
+    # Plot 5
+    output$plot5 <- renderPlot({
+      density5 <-
+        ggplot() + 
+        theme_void()
+      
+      # IF a data object exists, update the blank ggplot.
+      # basically this makes it not mess up when nothing is selected
+      if(nrow(plot5_dats()) > 1){
+        density5 <-
+          size_histogram(dats = plot5_dats(),
+                       x  = input$x5)
+      }
+      
+      # Print the plot
+      density5
+      
+    })
+    
+    # Plot 6
+    output$plot6 <- renderPlot({
+      density6 <-
+        ggplot() + 
+        theme_void()
+      
+      # IF a data object exists, update the blank ggplot.
+      # basically this makes it not mess up when nothing is selected
+      if(nrow(plot6_dats()) > 1){
+        density6 <-
+          size_histogram(dats = plot6_dats(),
+                       x  = input$x6)
+      }
+      
+      # Print the plot
+      density6
+      
+    })
+
     # Table 1
     output$table1 <- renderTable(
       {table1}, 
@@ -218,9 +316,36 @@ shinyServer(function(input, output) {
       hover = TRUE, spacing = 'l',  
       width = '100%', align = 'c',  
       rownames = TRUE,  
-      digits = 3, 
-      sanitize.text.function=identity) ## last row to read <br> as line break
+      digits = 3, na = '',
+      sanitize.text.function=identity) ## last row to read html
     
+    # Table 2
+    output$table2 <- renderTable(
+      {table2}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  na = '',
+      digits = 3, 
+      sanitize.text.function=identity) 
+    
+    # Table 3a
+    output$table3a<- renderTable(
+      {table3a}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE, na = '',
+      sanitize.text.function=identity)
+    
+    # Table 3b
+    output$table3b<- renderTable(
+      {table3b}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE, na = '', digits =0,
+      sanitize.text.function=identity)
     
     
     

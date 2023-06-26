@@ -242,7 +242,8 @@ temp1 <-
   ## Select relevant columns
   dplyr::select(date:dry_mass_mg) %>% 
   ## Rename
-  dplyr::rename(day = date) %>% 
+  dplyr::rename(day = date,
+                biomass_mg = dry_mass_mg) %>% 
   ## Make column for beginning and end
   dplyr::mutate(when = ifelse(day == "28/03/2022",
                               "start", "end")) %>% 
@@ -259,17 +260,19 @@ temp2 <-
   dplyr::select(date:dry_weight_mg) %>% 
   ## Rename
   dplyr::rename(day = date,
-                dry_mass_mg = dry_weight_mg) %>% 
+                biomass_mg = dry_weight_mg) %>% 
   ## Keep only beginning and end days
   dplyr::filter(day %in% c("06/10/2022", "04/11/2022")) %>% 
   ## Make column for beginning and end
   dplyr::mutate(when = ifelse(day == "06/10/2022",
                               "start", "end")) %>% 
-  ## Make country column
-  dplyr::mutate(country = "trini")
+  ## Make country column and put NAs for those insects whose weight was 0
+  dplyr::mutate(country = "trini",
+                biomass_mg = ifelse(biomass_mg == 0,
+                                    NA, biomass_mg))
 
 # Combine data
-community_data <- 
+community_data2 <- 
   temp1 %>% 
   dplyr::bind_rows(temp2) %>% 
   ## Join treatments
@@ -286,6 +289,7 @@ community_data <-
                 size_mm = length_mm,
                 ord = order) %>% 
   dplyr::mutate(bwg_name = NA,
+                biomass_type = "dry",
                 stage = ifelse(class == "Hexapoda", 
                                "larva", "adult"),
                 size_mm = ifelse(is.na(size_mm),
@@ -300,7 +304,7 @@ community_data <-
 
 # Explore data to confirm there is nothing wrong
 hist(as.numeric(community_data$size_original))
-hist(community_data$dry_mass_mg) ## Think what to do with 0 values
+hist(as.numeric(community_data$biomass_mg)) 
 unique(community_data$class)
 unique(community_data$ord)
 unique(community_data$family)
@@ -364,7 +368,7 @@ emergence_data <-
                    by = c("country", "bromeliad_id"))
 # Explore data to confirm there is nothing wrong
 hist(as.numeric(emergence_data$length_mm)) ## Stupid conversion error on excel
-hist(community_data$dry_mass_mg) 
+hist(emergence_data$dry_mass_mg) 
 hist(emergence_data$n)
 unique(emergence_data$Class)
 unique(emergence_data$Order)
@@ -379,7 +383,15 @@ emergence_data <-
   dplyr::mutate(length_mm = ifelse(length_mm %in% c("44625", "44566"),
                                    NA, length_mm),
                 Species = ifelse(Species == "flly3",
-                                 "fly3", Species))
+                                 "fly3", Species),
+                Family = ifelse(Family == "Chrysomleidae",
+                                "Chrysomelidae", ifelse(Family == "Formcidae",
+                                                        "Formicidae", Family)))  %>% 
+  ### Have to prepare data for hellometry
+  dplyr::rename_with(str_to_lower) %>% 
+  dplyr::rename(abundance = n,
+                size_mm = length_mm,
+                ord = order)
 
 ## Save data
 readr::write_csv(emergence_data,

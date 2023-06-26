@@ -1,4 +1,4 @@
-# Miscellaneous
+# Water and decomposition analyses
 
 # Libraries
 library(tidyverse)
@@ -9,24 +9,6 @@ source(here::here("brastri",
                   "functions.R"))
 
 # Load data
-## Aquatic communities
-community <-
-  readr::read_csv(here::here("brastri", "data",
-                             "community_data.csv")) %>% 
-  ## Remove ci columns and convert biomass data
-  dplyr::mutate(dry_mass_mg = ifelse(is.na(dry_mass_mg),
-                                     biomass_mg, dry_mass_mg)) %>% 
-  dplyr::select(-contains("ci"), - biomass_mg, -size_used_mm, -bwg_name, -path, -size_original, -day,
-                -stage, -abundance)
-## Bromeliads
-bromeliads <-
-  readr::read_csv(here::here("brastri", "data",
-                             "bromeliad_data.csv")) %>% 
-  ## Keep experimental bromeliads only
-  dplyr::filter(stringr::str_detect(string = bromeliad_id, patter = "E")) %>% 
-  ## Remove the columns not needed
-  dplyr::select(-contains(c("_g", "actual", "site", "mm")))
-
 ## Water chemistry
 water <-
   readr::read_csv(here::here("brastri", "data",
@@ -40,68 +22,56 @@ water <-
   ## Add decomposition values
   dplyr::left_join(readr::read_csv(here::here("brastri", "data",
                                               "bromeliad_data.csv")) %>% 
-                     dplyr::select(country, bromeliad_id, contains("_dry")),
+                     dplyr::select(country, bromeliad_id, contains(c("_dry", "_normal"))),
                    by = c("country", "bromeliad_id"))
 
+## Aquatic communities
+community <-
+  readr::read_csv(here::here("brastri", "data",
+                             "community_data.csv")) %>% 
+  ## Remove ci columns
+  dplyr::select(-contains("ci"), -size_used_mm, -bwg_name, -path, -size_original, -day,
+                -stage, -abundance)
+## Bromeliads
+bromeliads <-
+  readr::read_csv(here::here("brastri", "data",
+                             "bromeliad_data.csv")) %>% 
+  ## Keep experimental bromeliads only
+  dplyr::filter(stringr::str_detect(string = bromeliad_id, patter = "E")) %>% 
+  ## Remove the columns not needed
+  dplyr::select(-contains(c("_g", "actual", "site", "mm")))
 
-# Plot of initial biomasses -----------------------------------------------
-# Make dats
-dats <- 
-  community %>% 
-  dplyr::filter(when == "start" & ord != "Odonata") %>% 
-  dplyr::select(-when) %>%
-  ## Make species name for plotting
+## Emergence data
+emergence <- 
+  readr::read_csv(here::here("brastri", "data",
+                             "emergence_data.csv")) %>% 
+  ## Make day date 
+  dplyr::mutate(day = lubridate::dmy(day)) %>%
+  ## Rename one column for the time being
+  dplyr::rename(bromeliad = bromspecies,
+                biomass_mg = dry_mass_mg) %>% 
+  ## Make custom species name
   get_specnames() %>% 
-  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu"),
-                                                     "Tipulidae", species),
-                dry_mass_mg = as.numeric(dry_mass_mg)) %>% 
-  dplyr::select(country:species) %>% 
-  ## Summarise by site
-  group_by(country, species) %>% 
-  dplyr::summarise(dplyr::across(dry_mass_mg,
-                   list(sum = sum, sd = sd))) %>% 
-  ## Reorder species name as factor, whose level follows growth rate
-  dplyr::mutate(species = factor(species, levels = c("Scirtidae_Scirtes", "Tipulidae", 
-                                                    "Chironomidae_Tanypodinae", "Chironominae_Polypedilum", 
-                                                    "Culicidae_Weomyia")))
-
-# Make list of picture labels
-labels <- c(Chironomidae_Tanypodinae = "<img src='brastri/www/chir.jpg' width='25' /><br>",
-            Chironominae_Polypedilum = "<img src='brastri/www/chir.jpg' width='25' /><br>",
-            Culicidae_Weomyia = "<img src='brastri/www/culi.jpg' width='25' /><br>",
-            Scirtidae_Scirtes = "<img src='brastri/www/scir.jpg' width='25' /><br>",
-            Tipulidae = "<img src='brastri/www/tipu.jpg' width='25' /><br>") # replace with whatever
-
-# Make plot
-biomass_plot_before <- 
-  ggplot(data = dats,
-       aes(x = species,
-           y = dry_mass_mg_sum)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = dry_mass_mg_sum - dry_mass_mg_sd, 
-                    ymax = dry_mass_mg_sum + dry_mass_mg_sd), width = 0.2) +
-  facet_wrap(~country,
-             labeller = labeller(country = 
-                                   c("bras" = "BR",
-                                     "trini" = "TT"))) +
-  xlab("") +
-  ylab("Estimated dry mass(mg)") +
-  scale_x_discrete(labels = labels) +
-  theme(axis.text.x = ggtext::element_markdown(),
-        panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(), 
-        axis.line = element_line(colour = "black"))
-
-# Save plot
-ggsave(here::here("brastri", "www",
-                 "biomass_plot_before.jpg"),
-      biomass_plot_before,
-      width = 7,
-      height = 5,
-      bg = "white")
-
-
+  ## Back to original species name
+  dplyr::rename(bromspecies = bromeliad)
+## Keep those species for which we had at least one body mass measurement
+emergence <- 
+  emergence %>% 
+  dplyr::filter(species %in% (emergence %>% 
+                                dplyr::filter(!is.na(biomass_mg)) %>% 
+                                dplyr::select(species) %>% 
+                                dplyr::distinct() %>% 
+                                dplyr::pull())) %>% 
+  ## Now make length column numeric, add unknown to those without, and estimate biomass
+  dplyr::mutate(size_mm = ifelse(is.na(size_mm) | size_mm %in% c("busted", "missing", "escaped"),
+                                   "unknown", size_mm),
+                bwg_name = NA,
+                stage = "adult",
+                biomass_type = "dry") %>% 
+  ## Get biomass for missing values
+  hellometry::add_taxonomy() %>% 
+  hellometry::hello_metry()
+  
 
 
 # Treatments on water chemistry variables ---------------------------------
@@ -302,21 +272,21 @@ table_1 <-
                   "<strong> -3.52 (-5.52, -1.47) <br>pd = 95.40% <br>% in ROPE = 0.18</strong>", # PPPM
                   "<strong>-6.17 (-7.35, -5.09) <br>pd = 100% <br>% in ROPE = 0</strong>" # Chloro
     ),
-    Resource = c("<0.001 (-0.01, 0.01) <br>pd = 56.05% <br>% in ROPE = 94.34", # temperature
+    `Resource enriched` = c("<0.001 (-0.01, 0.01) <br>pd = 56.05% <br>% in ROPE = 94.34", # temperature
                  "-0.03 (-0.06, 0.00) <br>pd = 96.67% <br>% in ROPE = 10.7", # pH
                  "1.81 (0.89, 2.83) <br>pd = 99.9% <br>% in ROPE = 93.68", # cond
                  "-0.31 (-0.80,  0.18) <br>pd = 89.38% <br>% in ROPE =1.61", # TP
                  "<strong>1.82 (0.39,  3.32) <br>pd = 99.35% <br>% in ROPE = 0</strong>", # PPPM
                  "-0.18 (-1.22,  0.84) <br>pd = 64.40% <br>% in ROPE = 1.39" # Chloro
     ),
-    Predator = c("-0.002(-0.02, 0.02) <br>pd = 51.58% <br>% in ROPE = 75.92", # temperature
+    `Predator present` = c("-0.002 (-0.02, 0.02) <br>pd = 51.58% <br>% in ROPE = 75.92", # temperature
                  "0.006 (-0.02, 0.01) <br>pd = 63.1% <br>% in ROPE = 38.74", # pH
                  "-0.44 (-1.40, 0.56) <br>pd = 82.03% <br>% in ROPE = 100", # cond
                  "<strong>-0.48  (-0.98,  0.00) <br>pd = 97.60% <br>% in ROPE = 0.11</strong>", # TP
                  "", # PPPM
                  "0.21  (-0.79,  1.21) <br>pd = 66.95% <br>% in ROPE = 1.58" # Chloro
     ),
-    ResourcexPredator = c("0.003 (-0.02, 0.03) <br>pd = 60.45% <br>% in ROPE = 63.16", # temperature
+    `Resource enrichedxPredator present` = c("0.003 (-0.02, 0.03) <br>pd = 60.45% <br>% in ROPE = 63.16", # temperature
                               "0.01 (-0.05, 0.07) <br>pd = 65.71% <br>% in ROPE = 26.21", # pH
                               "-0.31 (-1.72, 1.01) <br>pd = 69.2% <br>% in ROPE = 100",# cond
                               "0.05 (-0.65,  0.75) <br>pd = 55.97% <br>% in ROPE = 3",# TP
@@ -369,34 +339,115 @@ ggsave(here::here("brastri", "www",
        bg = "white")
 
 
-# Treatments on decomposition and biomass ---------------------------------
-# Decomposition coarse
+# Treatments on decomposition dry ---------------------------------
+# Decomposition coarse dry
 ## Fit model
-coarsemodel <-
+coarsemodel_dry <-
   brms::brm(log(prop_loss_coarse_dry)  ~
-              resource*predator + (1|day) + (1|bromeliad_id/bromspecies/country),
+              resource*predator + (1|bromspecies/country),
             iter = 2000,
-            family = gaussian(link = "identity"),    
-            control = list(adapt_delta = 0.95,
-                           max_treedepth = 10),
+            family = gaussian(link = "identity"),      
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
             data = water)
 ## Check assumptions
-plot(coarsemodel)
+plot(coarsemodel_dry)
 ## Check effects
-bayestestR::describe_posterior(coarsemodel)
+bayestestR::describe_posterior(coarsemodel_dry)
+## Plot
+fig3a <- 
+  treatment_plot(model = coarsemodel_dry, 
+                 scale = "log",
+                 parameter = "coarse_dry", 
+                 bromeliads = bromeliads, 
+                 communities = communities, 
+                 water = water, 
+                 emergence = emergence)
 
-# Decomposition fine
+# Decomposition fine dry
 ## Fit model
-finemodel <-
+finemodel_dry7 <-
   brms::brm(log(prop_loss_fine_dry)  ~
-              resource*predator + (1|day) + (1|bromeliad_id/bromspecies/country),
+              resource*predator + (1|bromspecies/country),
             iter = 2000,
-            family = gaussian(link = "identity"),    
-            control = list(adapt_delta = 0.95,
-                           max_treedepth = 10),
+            family = gaussian(link = "identity"),        
+            control = list(adapt_delta = 0.995,
+                           max_treedepth = 15),
+            data = water)
+
+## Check assumptions
+plot(finemodel_dry)
+## Check effects
+bayestestR::describe_posterior(finemodel_dry)
+## Plot
+fig3b <- 
+  treatment_plot(model = finemodel_dry, 
+                 parameter = "fine_dry", 
+                 scale = "log",
+                 bromeliads = bromeliads, 
+                 communities = communities, 
+                 water = water, 
+                 emergence = emergence)
+
+# Generate table with outputs
+## Make table
+table_2 <- 
+  data.frame(
+    ` ` = c("<strong>Coarse mesh decomposition <br>ROPE =(-0.01, 0.01)</strong>", # Coarse
+            "<strong>Fine mesh decomposition <br>ROPE =(-0.01, 0.01)</strong>" # Fine
+            ),
+    Intercept = c("-0.19 (-0.71,  0.24) <br>pd = 91.57% <br>% in ROPE = 1.32", # Coarse
+                  "-0.17 (-0.67,  0.39) <br>pd = 88.12% <br>% in ROPE = 1.37" # Fine
+    ),
+    `Resource enriched` = c("-0.009 (-0.01,  0.00) <br>pd = 100% <br>% in ROPE = 60.89", # Coarse
+                            "<strong>-0.02 (-0.02, -0.01) <br>pd = 100% <br>% in ROPE = 4.37</strong>" # Fine
+    ),
+    `Predator present` = c("<0.001 (-0.01,  0.01) <br>pd = 51.324% <br>% in ROPE = 23.81", # Coarse
+                           "<0.001 (-0.01,  0.01) <br>pd = 51.18% <br>% in ROPE = 100" # Fine
+    ),
+    `Resource enrichedxPredator present` = c("0.006  (0.00,  0.01) <br>pd = 92.22% <br>% in ROPE = 81.13", # Coarse
+                                                 "0.009 (0.00,  0.02) <br>pd = 93.23% <br>% in ROPE = 51.92" # Fine
+    )
+  )
+## Save table
+readr::write_csv(table_2,
+                 here::here("brastri", "data",
+                            "table_2.csv"))
+
+# Generate figure
+## Make figure
+fig3 <- 
+  cowplot::plot_grid(fig3a +
+                       theme(legend.position = "none") +
+                       ggtitle("a"),
+                     fig3b +
+                       theme(legend.position = "none") +
+                       ggtitle("b"),
+                     legend,
+                     ncol = 3)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "fig3.jpg"),
+       fig3,
+       width = 11,
+       height = 4,
+       bg = "white")
+ 
+
+# Decomposition normal ----------------------------------------------------
+# Decomposition coarse normal
+## Fit model
+coarsemodel_normal <-
+  brms::brm(prop_loss_coarse_normal  ~
+              resource*predator + (1|day) + (1|bromspecies/country),
+            iter = 5000,
+            family = Beta(),    
+            control = list(adapt_delta = 0.85,
+                           max_treedepth = 12),
             data = water)
 ## Check assumptions
-plot(finemodel)
+plot(coarsemodell_normal)
 ## Check effects
-bayestestR::describe_posterior(finemodel)
+bayestestR::describe_posterior(coarsemodel_normal,
+                               rope_range = c(-0.01, 0.01))
 
