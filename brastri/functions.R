@@ -162,6 +162,37 @@ get_those_dats <- function(y = "none", x = "none",
       dplyr::rename(x = size_original)
   }
   
+  # Biomass emerged
+  if(stringr::str_detect(string = y, pattern = "emerg")){
+    ret <- 
+      emergence %>% 
+      dplyr::mutate(biomass_mg = as.numeric(biomass_mg)) %>% 
+      dplyr::rename(y = biomass_mg)
+  }
+  
+  # Growth rate
+  if(stringr::str_detect(string = y, pattern = "growth")){
+    ret <- 
+      emergence %>% 
+      dplyr::rename(y = ndays)
+  }
+  
+  # Proportion larvae emerging
+  if(stringr::str_detect(string = y, pattern = "prop_")){
+    ret <- 
+      emergence %>% 
+      dplyr::rename(y = prop)
+  }
+  
+  # Leftover as larvae
+  if(stringr::str_detect(string = y, pattern = "lefto")){
+    ret <- 
+      communities %>% 
+      dplyr::mutate(biomass_mg = as.numeric(biomass_mg)) %>% 
+      dplyr::rename(y = biomass_mg)
+  }
+  
+  
   # Return data
   return(ret)
   
@@ -227,6 +258,114 @@ axis_label <- function(parameter){
     ret <- 
       "Mass loss proportion in fine mesh bag (wet-wet)"
   
+  if(parameter == "emergence_all")
+    ret <- 
+      "Total dry biomass emerged (mg)"
+  
+  if(parameter == "emergence_seed")
+    ret <- 
+      "Total dry biomass emerged \nfrom seeded groups (mg)"
+  
+  if(parameter == "emergence_cera_tot")
+    ret <- 
+      "Total dry biomass of \nemerged ceratopogonids (mg)"
+  
+  if(parameter == "emergence_chir_tot")
+    ret <- 
+      "Total dry biomass of \nemerged chironomids (mg)"
+  
+  if(parameter == "emergence_culi_tot")
+    ret <- 
+      "Total dry biomass of \nemerged culicids (mg)"
+  
+  if(parameter == "emergence_tipu_tot")
+    ret <- 
+      "Total dry biomass of \nemerged tipulids (mg)"
+  
+  if(parameter == "emergence_cera_ind")
+    ret <- 
+      "Dry body mass \nof emerged ceratopogonids (mg)"
+  
+  if(parameter == "emergence_chir_ind")
+    ret <- 
+      "Dry body mass \nof emerged chironomids (mg)"
+  
+  if(parameter == "emergence_culi_ind")
+    ret <- 
+      "Dry body mass \nof emerged culicids (mg)"
+  
+  if(parameter == "emergence_tipu_ind")
+    ret <- 
+      "Dry body mass \nof emerged tipulids (mg)"
+  
+  if(parameter == "growth_cera_ind")
+    ret <- 
+      "Number of days until \nceratopogonid emergence"
+  
+  if(parameter == "growth_chir_ind")
+    ret <- 
+      "Number of days until \nchironomid emergence"
+  
+  if(parameter == "growth_culi_ind")
+    ret <- 
+      "Number of days until \nculicid emergence"
+  
+  if(parameter == "growth_tipu_ind")
+    ret <- 
+      "Number of days until \ntipulid emergence"
+  
+  if(parameter == "prop_seed")
+    ret <- 
+      "Proportion of seeded \nlarvae emerging"
+  
+  if(parameter == "prop_culi")
+    ret <- 
+      "Proportion of culicids \nemerging"
+  
+  if(parameter == "prop_tipu")
+    ret <- 
+      "Proportion of tipulids \nemerging"
+  
+  if(parameter == "leftover_all")
+    ret <- 
+      "Total dry biomass leftover (mg)"
+  
+  if(parameter == "leftover_seed")
+    ret <- 
+      "Total dry biomass leftover \nfrom seeded groups (mg)"
+  
+  if(parameter == "leftover_chir_tot")
+    ret <- 
+      "Total dry biomass of \nleftover chironomids (mg)"
+  
+  if(parameter == "leftover_culi_tot")
+    ret <- 
+      "Total dry biomass of \nleftover culicids (mg)"
+  
+  if(parameter == "leftover_scir_tot")
+    ret <- 
+      "Total dry biomass of \nleftover scirtids (mg)"
+  
+  if(parameter == "leftover_tipu_tot")
+    ret <- 
+      "Total dry biomass of \nleftover tipulids (mg)"
+  
+  if(parameter == "leftover_chir_ind")
+    ret <- 
+      "Dry body mass \nof leftover chironomids (mg)"
+  
+  if(parameter == "leftover_culi_ind")
+    ret <- 
+      "Dry body mass \nof leftover culicids (mg)"
+  
+  if(parameter == "leftover_scir_ind")
+    ret <- 
+      "Dry body mass \nof leftover scirtids (mg)"
+  
+  if(parameter == "leftover_tipu_ind")
+    ret <- 
+      "Dry body mass \nof leftover tipulids (mg)"
+
   # Return
   return(ret)
   
@@ -246,8 +385,8 @@ density_plot <- function(dats, x){
     geom_density(fill = "darkgoldenrod1") +
     facet_wrap(~ country,
                labeller = labeller(country = 
-                                     c("bras" = "BR",
-                                       "trini" = "TT"))) +
+                                     c("bras" = "REGUA",
+                                       "trini" = "SIMLA"))) +
     xlab(x_label) +
     ylab("Frequency") + 
     theme(axis.text.y = element_blank(),
@@ -278,8 +417,8 @@ size_histogram <- function(dats, x){
     facet_grid(cols = vars(when),
                rows = vars(country), 
                labeller = labeller(country = 
-                                     c("bras" = "BR",
-                                       "trini" = "TT"),
+                                     c("bras" = "REGUA",
+                                       "trini" = "SIMLA"),
                                    when = 
                                      c("start" = "Beginning",
                                        "end" = "End"))) +
@@ -323,15 +462,15 @@ time_plot <- function(dats, y){
     facet_wrap(~ country,
                scales = "free",
                labeller = labeller(country = 
-                                     c("bras" = "BR",
-                                       "trini" = "TT")))} else
+                                     c("bras" = "REGUA",
+                                       "trini" = "SIMLA")))} else
                  ret <- 
                    ret +
                    facet_wrap(~ country,
                               scales = "free_x",
                               labeller = labeller(country = 
-                                                    c("bras" = "BR",
-                                                      "trini" = "TT")))
+                                                    c("bras" = "REGUA",
+                                                      "trini" = "SIMLA")))
   
   # Back to making the plot
   ret <- 
@@ -579,3 +718,195 @@ prep_dats_hist <- function(dats){
   
 }
 
+
+
+# Summarise emergence data ------------------------------------------------
+summarise_emergence <- function(dats, bromeliads, group){
+
+  # If we want overall biomass
+  if(group == "all"){
+    ret <- 
+      dats %>% 
+      dplyr::select(-species)
+    
+    
+  } else if(group == "seed"){
+    ret <- 
+      dats %>% 
+      dplyr::filter(!stringr::str_detect(string = family,
+                                         pattern = "Psyc|Cera"))
+    
+    
+  } else if(group == "Psyc"){
+    ret <- 
+      dats %>% 
+      dplyr::filter(stringr::str_detect(string = family,
+                                        pattern = group)) %>% 
+      dplyr::select(-species)
+    
+  } else{
+    # If we want one group in particular
+    ret <- 
+      dats %>% 
+      dplyr::filter(stringr::str_detect(string = species,
+                                        pattern = group)) %>% 
+      dplyr::select(-species)}
+  
+  # Combine biomass of selected species
+  ret <- 
+    ret %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, predator, biomass_mg) %>% 
+    dplyr::group_by(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::mutate(biomass_mg = as.numeric(biomass_mg)) %>% 
+    dplyr::summarise_all(sum) %>% 
+    dplyr::ungroup()
+  
+  # Combine with bromeliad data to get 0 where nothing emerged
+  ret <- 
+    bromeliads %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::left_join(ret,
+                     by = c("country", "bromspecies", "bromeliad_id", "resource", "predator")) %>%
+    dplyr::mutate(biomass_mg = ifelse(is.na(biomass_mg), 
+                                      0, biomass_mg))
+  
+  # Return
+  return(ret)
+  
+  
+  }
+
+
+
+# Summarise emergence propotion -------------------------------------------------
+summarise_proportion <- function(dats, bromeliads, group){
+  
+  # If we want overall proportion
+  if(group == "seed"){
+    ret <- 
+      dats %>% 
+      dplyr::filter(!stringr::str_detect(string = family,
+                                         pattern = "Psyc|Cera"))
+    
+  } else{
+    # If we want one group in particular
+    ret <- 
+      dats %>% 
+      dplyr::filter(stringr::str_detect(string = species,
+                                        pattern = group)) %>% 
+      dplyr::select(-species)}
+  
+  # Combine abundance of selected species
+  ret <- 
+    ret %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, predator, biomass_mg) %>% 
+    dplyr::group_by(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::tally() %>% 
+    dplyr::ungroup()
+  
+  # Combine with bromeliad data to get 0 where nothing emerged
+  ret <- 
+    bromeliads %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::left_join(ret,
+                     by = c("country", "bromspecies", "bromeliad_id", "resource", "predator")) %>%
+    dplyr::mutate(n = ifelse(is.na(n), 
+                             0, n))
+  
+  # Add number seeded (last one is scirtids)
+  br <- 
+    ifelse(group == "seed",
+           15, ifelse(group == "Chiro",
+                      4, ifelse(group == "Culi",
+                                7, ifelse(group == "Tipu", 
+                                          3, 0))))
+  tt <- 
+    ifelse(group == "seed",
+           9, ifelse(group == "Chiro",
+                     1, ifelse(group == "Culi",
+                               0, ifelse(group == "Tipu", 
+                                         3, 5))))
+  
+  # Get proportion
+  ret <- 
+    ret %>% 
+    dplyr::mutate(seeded = ifelse(country == "bras",
+                                  br, tt))
+  
+  # Don't forget to include odonates
+  if(group == "seeded"){
+    ret <- 
+      ret %>% 
+      dplyr::mutate(n = ifelse(predator == "present",
+                               n + 1, n))
+  }
+  
+  # Get proportion
+  ret <- 
+    ret %>% 
+    dplyr::mutate(prop = ifelse(seeded == 0,
+                                NA, n/seeded))
+  
+  
+  # Return
+  return(ret)
+  
+  
+}
+
+
+
+# Summarise leftover data ------------------------------------------------
+summarise_leftover <- function(dats, bromeliads, group){
+  
+  # If we want overall biomass
+  if(group == "all"){
+    ret <- 
+      dats %>% 
+      dplyr::select(-species)
+    
+    
+  } else if(group == "seed"){
+    ret <- 
+      dats %>% 
+      dplyr::filter(seeded == "seeded")
+    
+  } else if(group == "Poly"){
+    # If we want polyp
+    ret <- 
+      dats %>% 
+      dplyr::filter(stringr::str_detect(string = genus,
+                                        pattern = group)) %>% 
+      dplyr::filter(seeded == "seeded") %>% 
+      dplyr::select(-species)} else {
+    # If we want one other group in particular
+    ret <- 
+      dats %>% 
+      dplyr::filter(stringr::str_detect(string = family,
+                                        pattern = group)) %>% 
+      dplyr::filter(seeded == "seeded") %>% 
+      dplyr::select(-species)}
+  
+  # Combine biomass of selected species
+  ret <- 
+    ret %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, predator, biomass_mg) %>% 
+    dplyr::group_by(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::mutate(biomass_mg = as.numeric(biomass_mg)) %>% 
+    dplyr::summarise_all(sum) %>% 
+    dplyr::ungroup()
+  
+  # Combine with bromeliad data to get 0 where nothing emerged
+  ret <- 
+    bromeliads %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::left_join(ret,
+                     by = c("country", "bromspecies", "bromeliad_id", "resource", "predator")) %>%
+    dplyr::mutate(biomass_mg = ifelse(is.na(biomass_mg), 
+                                      0, biomass_mg))
+  
+  # Return
+  return(ret)
+  
+  
+}

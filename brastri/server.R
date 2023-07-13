@@ -88,6 +88,30 @@ shinyServer(function(input, output) {
                                  "table_3b.csv")) %>% 
       data.frame(row.names = 1) %>% 
       make_names_nicer()
+    
+    ## Table 4 with model outputs
+    table4 <- 
+      readr::read_csv(here::here(#"brastri", 
+        "data",
+        "table_4.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    
+    ## Table 5 with model outputs
+    table5 <- 
+      readr::read_csv(here::here(#"brastri", 
+        "data",
+        "table_5.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    
+    ## Table 6 with model outputs
+    table6 <- 
+      readr::read_csv(here::here(#"brastri", 
+        "data",
+        "table_6.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
 
     # Make reactive datasets (subset data for each plot depending on selection) ---------------------------------------------------
     # Plot 1
@@ -335,7 +359,7 @@ shinyServer(function(input, output) {
       striped = TRUE, bordered = TRUE,  
       hover = TRUE, spacing = 'l',  
       width = '100%', align = 'c',  
-      rownames = TRUE, na = '',
+      rownames = TRUE, na = '', digits =0,
       sanitize.text.function=identity)
     
     # Table 3b
@@ -346,6 +370,36 @@ shinyServer(function(input, output) {
       width = '100%', align = 'c',  
       rownames = TRUE, na = '', digits =0,
       sanitize.text.function=identity)
+    
+    # Table 4
+    output$table4 <- renderTable(
+      {table4}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  
+      digits = 3, na = '',
+      sanitize.text.function=identity) ## last row to read html
+    
+    # Table 5
+    output$table5 <- renderTable(
+      {table5}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  na = '',
+      digits = 3, 
+      sanitize.text.function=identity) 
+    
+    # Table 6
+    output$table6 <- renderTable(
+      {table6}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  na = '',
+      digits = 3, 
+      sanitize.text.function=identity) 
     
     
     

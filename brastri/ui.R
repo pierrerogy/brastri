@@ -20,6 +20,7 @@ source(here::here(#"brastri",
 # Define UI for application
 shinyUI(navbarPage(
 
+  UPDATE FIGURES
   # First do header
   title = "Data from Pierre's experiments",
   # Style -------------------------------------------------------------------
@@ -52,9 +53,9 @@ shinyUI(navbarPage(
              style = "display: inline-block; margin-left: 5px; font-family: Sylfaen"),
           span(strong("(a)"), "The first step of our experimental design consisted in seeding bromeliads
           under emergence traps with experimental (Exp.) communities based on a large census 
-          of wild bromeliads in Trinidad-and-Tobago (TT) and Brasil (BR). The TT community was 
+          of wild bromeliads in Trinidad-and-Tobago (SIMLA) and Brasil (REGUA). The SIMLA community was 
           composed of fives", em("Scirtes"), "sp. (Coleoptera: Scirtidae), three Tipulid sp. 
-          (Diptera: Tipulidae), and one", em("Polypedilum"), "sp. (Diptera: Chironomidae), and, in BR, 
+          (Diptera: Tipulidae), and one", em("Polypedilum"), "sp. (Diptera: Chironomidae), and, in REGUA, 
           of three", em("Trentepholia"), "sp. (Diptera: Tipulidae), one Tanypodinae sp. 
           (Diptera: Chironomidae), four", em("Polypedilum"), "sp. (Diptera: Chironomidae), and seven 
           Culicinae sp. (Diptera: Culicidae). We then randomly attributed bromeliads to a 
@@ -85,7 +86,7 @@ shinyUI(navbarPage(
       ## Third has the methods image, only one column
       box(width = NULL, status = "primary", collapsible = F,
           column(12, 
-               div(img(src = "img1.png",
+               div(img(src = "fig1.png",
                        height = "75%", width = "85%"), 
                    style = "text-align: center;"))),
       ## Empty box
@@ -301,7 +302,7 @@ shinyUI(navbarPage(
           box(width = NULL, status = "primary",
               solidHeader = F, 
               column(12, 
-                     div(img(src = "fig2.jpg",
+                     div(img(src = "figs1.jpg",
                              height = "100%", width = "100%"), 
                          style = "text-align: center;"))),
           ## Sixth row has table
@@ -338,15 +339,15 @@ shinyUI(navbarPage(
                 style = "display: inline-block; margin-left: 10px; "))),
           ## Ninth row has figure 2
           column(12, 
-                 div(img(src = "fig3.jpg",
+                 div(img(src = "figs2.jpg",
                          height = "100%", width = "100%"), 
                      style = "text-align: center;")),
         )),
-# Fourth tab - decomposition and biomass export -----------------------------------------------
-tabPanel("Invertebrates",
+# Fourth tab - Problem with invertebrates -----------------------------------------------
+tabPanel("A problem with invertebrates",
          mainPanel(
-           ## First has presentation the bromelaids
-           h3(strong("Invertebrate analyses"),
+           ## First has presentation of the methods
+           h3(strong("A problem with invertebrates"),
               style = "display: inline-block; margin-left: 5px;"),
               p(span("As described in the raw data panel, we have seeded our bromeliads
                        with a standardised community in each site. We then covered our
@@ -514,14 +515,139 @@ tabPanel("Invertebrates",
                            in many different places for this project, I am trying ways so that everyone who
                            wants to participate more can do it effectively. Please let me knwo if you have
                            a better way in mind!",
-                      style = "display: inline-block; margin-left: 5px; ")))
+                      style = "display: inline-block; margin-left: 5px; "))),
+         )),
+# Fifth tab - Invertebrate analysis attempt -----------------------------------------------
+tabPanel("Invertebrate analysis attempt",
+         mainPanel(
+           ## First explication of the attempts
+           h3(strong("Attempt at analysing invertebrate data"),
+              style = "display: inline-block; margin-left: 5px;"),
+           p(span("I decided to proceed first with the emergence data, as the problem
+                  was easier to solve. Here, I used a combined approach to decide if an
+                  adult insect was likely to have emerged from a bromeliad. First, we
+                  raised larvae from bromeliads, to compare the adult stages of these larvae
+                  to those we may have found in the bromeliad. But some larva are tricky to raise,
+                  so we were not able to get adults for all species, in particular for chironomids
+                  and ceratopogonids, we thus considered all members of these families as having
+                  emerged from the bromeliads. ", br(),
+                  "I have divided the analysis concerning the biomass at emergence in two 
+                  parts, one where I have summed up the biomasses of all individuals within a 
+                  family (total biomass emerged), and the other where I have kept individual 
+                  biomasses (individual biomass emerged). While the first part gives us an 
+                  idea of how much biomass export varies amongst treatment, the second ones 
+                  gives us an idea of how individuals may vary across treatments. Note that 
+                  these analyses include two families that we did not seed at the beginning
+                  of the experiment: Psychodidae and Ceratopogonidae.",
+                  style = "display: inline-block; margin-left: 5px; ")),
+           ## Second has total biomass emerged
+           column(12, 
+                 p(h4(strong("Outputs of models on total biomass emerged"),
+                 style = "background: #f39c12;margin-left: 0px"))),
+           column(12, 
+                  p(span("The effect of our treatments on emergence 
+                         differed amongst groups. First, there was no 
+                         effect on the overall biomass of bromeliad-
+                         associated insects captured within the emergence 
+                         traps, nor on the total biomass of insects from 
+                         groups seeded at the beginning of the experiment.
+                         At the family level, the total emerged biomass of
+                         chironomids responded to our treatments in an 
+                         interactive manner. There was less chironomid
+                         biomass emerging in the presence of a predator 
+                         when the resource was not enriched in P, but, 
+                         when the resource was enriched in P, there was 
+                         more chironomid biomass emerging. On the other hand, 
+                         the total biomass of culicids, tipulids and 
+                         ceratopogonids did not vary across treatments.",
+                         style = "display: inline-block; margin-left: 5px; "))),
+           column(width = 12,
+                      p(span(strong("Table 4."), "The posterior median values compare to 
+                             a reference state of Resource = control and Predator = absent. pd = probability of direction 
+                             (proportion of the posterior distribution that is of the same sign that the median), 
+                             ROPE = region of practical equivalence (effect size of no practical relevance, here 
+                             twice the standard deviation of the dependent variable around 0). 
+                             Values between parentheses to the right of the median represent the boundaries of the 
+                             95% confidence interval, while under the dependent variable name represent the ROPE itself. 
+                             Significant associations are in boldface.",
+                             style = "display: inline-block; margin-left: 5px; "))),
+           column(width = 12,
+                  tableOutput("table4")),
+           column(12, 
+                  p(span(strong("Figure 9"),
+                  "Associations of our treatments with different 
+                  total biomass emerged at the bromeliad scale"))),
+           column(width = 12,
+                  div(img(src = "fig2.jpg",
+                          height = "100%", width = "100%"), 
+                      style = "text-align: center;")),    
+           ## Third has individual biomass emerged
+           column(12, 
+                  p(h4(strong("Outputs of models on individual body mass of emerged adults."),
+                       style = "background: #f39c12;margin-left: 0px"))),
+           column(12, 
+                  p(span("In terms of individual body mass, chironomid 
+                         individuals were also heavier when emerging from 
+                         bromeliads with predators and having received 
+                         enriched litter as resource. In the presence of 
+                         predators, culicids emerged smaller if the 
+                         resource was control, but larger if the resource 
+                         was enriched in P. Tipulids showed a different 
+                         pattern, as their body mass was smaller when 
+                         emerging from bromeliads without predators and 
+                         with enriched leaf litter. Finally, ceratopogonids
+                         remained unaffected by either treatment."))),
+           column(width = 12,
+                  p(span(strong("Table 5."), 
+                   "The posterior median values compare to 
+                   a reference state of Resource = control and Predator = absent. pd = probability of direction 
+                   (proportion of the posterior distribution that is of the same sign that the median), 
+                   ROPE = region of practical equivalence (effect size of no practical relevance, here 
+                   twice the standard deviation of the dependent variable around 0). 
+                   Values between parentheses to the right of the median represent the boundaries of the 
+                   95% confidence interval, while under the dependent variable name represent the ROPE itself. 
+                   Significant associations are in boldface."))),
+           column(width = 12,
+                  tableOutput("table5")),
+           column(12, 
+                  p(span(strong("Figure 10."),
+                  "Associations of our treatments with 
+                  individual body mass of emerged adults"))),
+           column(12, 
+                  div(img(src = "fig4.jpg",
+                          height = "100%", width = "100%"), 
+                      style = "text-align: center;")),
+         
            
-           
-           
-           
-           
-         ))
+           ## Fourth introduction of emergence rate analysis
+            column(12,
+                   p(h4(strong("Outputs of models on number of days until emergence."),
+                        style = "background: #f39c12;margin-left: 0px"))),
+         column(12, 
+                p(span("Our treatments did not influence the rate at which 
+                         organisms emerged from the bromeliads "))),
+           column(width = 12,
+                  p(span(strong("Table 6."), 
+                  "The posterior median values compare to 
+                  a reference state of Resource = control and Predator = absent. pd = probability of direction 
+                  (proportion of the posterior distribution that is of the same sign that the median), 
+                  ROPE = region of practical equivalence (effect size of no practical relevance, here 
+                  twice the standard deviation of the dependent variable around 0). 
+                  Values between parentheses to the right of the median represent the boundaries of the 
+                  95% confidence interval, while under the dependent variable name represent the ROPE itself. 
+                  Significant associations are in boldface."))),
+           column(width = 12,
+                  tableOutput("table6")),
+           column(12, 
+                  p(span(strong("Figure 11."),
+                  "Associations of our treatments with 
+                      number of days until emergence"))),
+           column(12, 
+                  div(img(src = "fig5.jpg",
+                          height = "100%", width = "100%"), 
+                      style = "text-align: center;")),
 
+           ))
 ))
     
 

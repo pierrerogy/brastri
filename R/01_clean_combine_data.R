@@ -114,9 +114,13 @@ hist(bromeliad_data$prop_loss_coarse_dry)
 hist(bromeliad_data$prop_loss_fine_dry)
 hist(bromeliad_data$distance_from_ground_cm)
 hist(bromeliad_data$longest_leaf_length_mm)
+unique(bromeliad_data$bromeliad_id)
 
 # Save data
-readr::write_csv(bromeliad_data,
+readr::write_csv(bromeliad_data %>% 
+                   ## Rename one bromeliad to avoid confusion later on
+                   dplyr::mutate(bromeliad_id = ifelse(bromeliad_id == "E",
+                                                       "F", bromeliad_id)),
                  here::here("brastri", "data",
                             "bromeliad_data.csv"))
 
@@ -272,7 +276,7 @@ temp2 <-
                                     NA, biomass_mg))
 
 # Combine data
-community_data2 <- 
+community_data <- 
   temp1 %>% 
   dplyr::bind_rows(temp2) %>% 
   ## Join treatments
@@ -312,6 +316,23 @@ unique(community_data$subfamily)
 unique(community_data$genus)
 unique(community_data$species)
 
+## Modify values
+community_data <- 
+  community_data %>% 
+  dplyr::mutate(genus = ifelse(genus == "Weomyia",
+                               "Wyeomyia", genus),
+                class = ifelse(ord == "Clitellata",
+                               "Clitellata", class),
+                ord = ifelse(family == "Oligochaeta",
+                             "Oligochaeta", ord),
+                family = ifelse(family == "Oligochaeta",
+                                NA, family),
+                family = ifelse(genus == "Wyeomyia", 
+                                "Culicidae", family),
+                family = ifelse(subfamily %in% c("Tanypodinae", "Chironominae"),
+                                "Chironomidae", family),
+                family = ifelse(genus == "Trentepohlia",
+                                "Tipulidae", family))
 ## Save data
 readr::write_csv(community_data,
                  here::here("brastri", "data",

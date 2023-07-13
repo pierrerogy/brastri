@@ -90,7 +90,7 @@ plot(tempmodel)
 ## Check effects
 bayestestR::describe_posterior(tempmodel)
 ## Plot
-fig2a <- 
+figs1a <- 
   treatment_plot(model = tempmodel, 
                  parameter = "Temperature",  
                  scale = "log",
@@ -114,7 +114,7 @@ plot(pHmodel)
 ## Check effects
 bayestestR::describe_posterior(pHmodel)
 ## Plot
-fig2b <- 
+figs1b <- 
   treatment_plot(model = pHmodel, 
                  parameter = "pH", 
                  scale = "log",
@@ -138,7 +138,7 @@ plot(condmodel)
 ## Check effects
 bayestestR::describe_posterior(condmodel)
 ## Plot
-fig2c <- 
+figs1c <- 
   treatment_plot(model = condmodel, 
                  parameter = "Conductivity", 
                  scale = "sqrt", 
@@ -162,7 +162,7 @@ plot(tpmodel)
 ## Check effects
 bayestestR::describe_posterior(tpmodel)
 ## Plot
-fig2d <- 
+figs1d <- 
   treatment_plot(model = tpmodel, 
                  parameter = "TP", 
                  scale = "log", 
@@ -195,7 +195,7 @@ model_effect <-
                 lower__ = exp(lower__),
                 upper__ = exp(upper__))
 ## Plot
-fig2e <- 
+figs1e <- 
   ggplot(data = water,
          aes(x = resource,
              y = phosphate_ppm + 0.0001,
@@ -244,7 +244,7 @@ plot(chloromodel)
 ## Check effects
 bayestestR::describe_posterior(chloromodel)
 ## Plot
-fig2f <- 
+figs1f <- 
   treatment_plot(model = chloromodel, 
                  parameter = "Chlorophyll-a", 
                  scale = "log", 
@@ -302,38 +302,38 @@ readr::write_csv(table_1,
 
 # Generate figure
 ## Make figure
-fig2 <- 
-  cowplot::plot_grid(fig2a +
+figs1 <- 
+  cowplot::plot_grid(figs1a +
                        theme(legend.position = "none") +
                        ggtitle("a"),
-                     fig2b +
+                     figs1b +
                        theme(legend.position = "none") +
                        ggtitle("b"),
-                     fig2c +
+                     figs1c +
                        theme(legend.position = "none") +
                        ggtitle("c"),
-                     fig2d +
+                     figs1d +
                        theme(legend.position = "none") +
                        ggtitle("d"),
-                     fig2e +
+                     figs1e +
                        theme(legend.position = "none") +
                        ggtitle("e"),
-                     fig2f +
+                     figs1f +
                        theme(legend.position = "none") +
                        ggtitle("f"),
                      ncol = 2)
 ## Combine with legend
 legend <- 
-  cowplot::get_legend(fig2a)
-fig2 <- 
+  cowplot::get_legend(figs1a)
+figs1 <- 
   cowplot::plot_grid(legend,
-                     fig2,
+                     figs1,
                      nrow = 2,
                      rel_heights = c(0.1, 0.9))
 ## Save figure
 ggsave(here::here("brastri", "www",
-                  "fig2.jpg"),
-       fig2,
+                  "figs1.jpg"),
+       figs1,
        width = 7,
        height = 11,
        bg = "white")
@@ -355,7 +355,7 @@ plot(coarsemodel_dry)
 ## Check effects
 bayestestR::describe_posterior(coarsemodel_dry)
 ## Plot
-fig3a <- 
+figs2a <- 
   treatment_plot(model = coarsemodel_dry, 
                  scale = "log",
                  parameter = "coarse_dry", 
@@ -366,7 +366,7 @@ fig3a <-
 
 # Decomposition fine dry
 ## Fit model
-finemodel_dry7 <-
+finemodel_dry <-
   brms::brm(log(prop_loss_fine_dry)  ~
               resource*predator + (1|bromspecies/country),
             iter = 2000,
@@ -380,7 +380,7 @@ plot(finemodel_dry)
 ## Check effects
 bayestestR::describe_posterior(finemodel_dry)
 ## Plot
-fig3b <- 
+figs2b <- 
   treatment_plot(model = finemodel_dry, 
                  parameter = "fine_dry", 
                  scale = "log",
@@ -391,10 +391,10 @@ fig3b <-
 
 # Generate table with outputs
 ## Make table
-table_2 <- 
+table_s2 <- 
   data.frame(
-    ` ` = c("<strong>Coarse mesh decomposition <br>ROPE =(-0.01, 0.01)</strong>", # Coarse
-            "<strong>Fine mesh decomposition <br>ROPE =(-0.01, 0.01)</strong>" # Fine
+    ` ` = c("<strong>Coarse mesh decomposition <br>ROPE = (-0.01, 0.01)</strong>", # Coarse
+            "<strong>Fine mesh decomposition <br>ROPE = (-0.01, 0.01)</strong>" # Fine
             ),
     Intercept = c("-0.19 (-0.71,  0.24) <br>pd = 91.57% <br>% in ROPE = 1.32", # Coarse
                   "-0.17 (-0.67,  0.39) <br>pd = 88.12% <br>% in ROPE = 1.37" # Fine
@@ -410,44 +410,155 @@ table_2 <-
     )
   )
 ## Save table
-readr::write_csv(table_2,
+readr::write_csv(table_s2,
                  here::here("brastri", "data",
-                            "table_2.csv"))
+                            "table_s2.csv"))
 
 # Generate figure
 ## Make figure
-fig3 <- 
-  cowplot::plot_grid(fig3a +
+figs2 <- 
+  cowplot::plot_grid(figs2a +
                        theme(legend.position = "none") +
                        ggtitle("a"),
-                     fig3b +
+                     figs2b +
                        theme(legend.position = "none") +
                        ggtitle("b"),
                      legend,
                      ncol = 3)
 ## Save figure
 ggsave(here::here("brastri", "www",
-                  "fig3.jpg"),
-       fig3,
+                  "figs2.jpg"),
+       figs2,
        width = 11,
        height = 4,
        bg = "white")
  
 
-# Decomposition normal ----------------------------------------------------
+# Treatments on decomposition dry - trying to reduce errorbars ---------------------------------
+# Decomposition coarse dry
+## Fit model
+coarsemodel_dry <-
+  brms::brm(log(prop_loss_coarse_dry)  ~
+              resource + (1|bromspecies/country),
+            iter = 2000,
+            family = gaussian(link = "identity"),      
+            control = list(adapt_delta = 0.95,
+                           max_treedepth = 15),
+            data = water)
+## Check assumptions
+plot(coarsemodel_dry)
+## Check effects
+bayestestR::describe_posterior(coarsemodel_dry)
+## Plot
+figs1a <- 
+  treatment_plot(model = coarsemodel_dry, 
+                 scale = "log",
+                 parameter = "coarse_dry", 
+                 bromeliads = bromeliads, 
+                 communities = communities, 
+                 water = water, 
+                 emergence = emergence)
+
+# Decomposition fine dry
+## Fit model
+finemodel_dry <-
+  brms::brm(log(prop_loss_fine_dry)  ~
+              resource*predator + (1|bromspecies/country),
+            iter = 2000,
+            family = gaussian(link = "identity"),        
+            control = list(adapt_delta = 0.995,
+                           max_treedepth = 15),
+            data = water)
+
+## Check assumptions
+plot(finemodel_dry)
+## Check effects
+bayestestR::describe_posterior(finemodel_dry)
+## Plot
+figs2b <- 
+  treatment_plot(model = finemodel_dry, 
+                 parameter = "fine_dry", 
+                 scale = "log",
+                 bromeliads = bromeliads, 
+                 communities = communities, 
+                 water = water, 
+                 emergence = emergence)
+
+# Generate table with outputs
+## Make table
+table_s2 <- 
+  data.frame(
+    ` ` = c("<strong>Coarse mesh decomposition <br>ROPE = (-0.01, 0.01)</strong>", # Coarse
+            "<strong>Fine mesh decomposition <br>ROPE = (-0.01, 0.01)</strong>" # Fine
+    ),
+    Intercept = c("-0.19 (-0.71,  0.24) <br>pd = 91.57% <br>% in ROPE = 1.32", # Coarse
+                  "-0.17 (-0.67,  0.39) <br>pd = 88.12% <br>% in ROPE = 1.37" # Fine
+    ),
+    `Resource enriched` = c("-0.009 (-0.01,  0.00) <br>pd = 100% <br>% in ROPE = 60.89", # Coarse
+                            "<strong>-0.02 (-0.02, -0.01) <br>pd = 100% <br>% in ROPE = 4.37</strong>" # Fine
+    ),
+    `Predator present` = c("<0.001 (-0.01,  0.01) <br>pd = 51.324% <br>% in ROPE = 23.81", # Coarse
+                           "<0.001 (-0.01,  0.01) <br>pd = 51.18% <br>% in ROPE = 100" # Fine
+    ),
+    `Resource enrichedxPredator present` = c("0.006  (0.00,  0.01) <br>pd = 92.22% <br>% in ROPE = 81.13", # Coarse
+                                             "0.009 (0.00,  0.02) <br>pd = 93.23% <br>% in ROPE = 51.92" # Fine
+    )
+  )
+## Save table
+readr::write_csv(table_s2,
+                 here::here("brastri", "data",
+                            "table_s2.csv"))
+
+# Generate figure
+## Make figure
+figs1 <- 
+  cowplot::plot_grid(figs1a +
+                       theme(legend.position = "none") +
+                       ggtitle("a"),
+                     figs1b +
+                       theme(legend.position = "none") +
+                       ggtitle("b"),
+                     legend,
+                     ncol = 3)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "figs1.jpg"),
+       figs1,
+       width = 11,
+       height = 4,
+       bg = "white")
+
+
+
+# Treatments on decomposition normal ----------------------------------------------------
 # Decomposition coarse normal
 ## Fit model
 coarsemodel_normal <-
-  brms::brm(prop_loss_coarse_normal  ~
+  brms::brm(log(prop_loss_coarse_normal)  ~
               resource*predator + (1|day) + (1|bromspecies/country),
-            iter = 5000,
-            family = Beta(),    
-            control = list(adapt_delta = 0.85,
-                           max_treedepth = 12),
+            iter = 2000,
+            family = gaussian(link = "identity"),    
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
             data = water)
 ## Check assumptions
-plot(coarsemodell_normal)
+plot(coarsemodel_normal)
 ## Check effects
-bayestestR::describe_posterior(coarsemodel_normal,
-                               rope_range = c(-0.01, 0.01))
+bayestestR::describe_posterior(coarsemodel_normal)
+
+# Decomposition coarse normal
+## Fit model
+finemodel_normal <-
+  brms::brm(log(prop_loss_fine_normal)  ~
+              resource*predator + (1|day) + (1|bromspecies/country),
+            iter = 2000,
+            family = gaussian(link = "identity"),    
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
+            data = water)
+## Check assumptions
+plot(finemodel_normal)
+## Check effects
+bayestestR::describe_posterior(finemodel_normal)
+
 
