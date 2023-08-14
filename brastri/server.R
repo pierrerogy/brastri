@@ -14,7 +14,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(here)
-source(here::here(#"brastri",
+source(here::here("brastri",
                   "functions.R"))
 
 
@@ -24,7 +24,7 @@ shinyServer(function(input, output) {
     # Read in the prepared data 
     ## Bromeliads
     bromeliads <-
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                    "bromeliad_data.csv")) %>% 
       ## Keep experimental bromeliads only
@@ -35,7 +35,7 @@ shinyServer(function(input, output) {
     
     ## Water chemistry
     water <-
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                  "water_data.csv")) %>% 
       ## Make day date
@@ -45,7 +45,7 @@ shinyServer(function(input, output) {
     
     ## Aquatic communities
     communities <-
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                  "community_data.csv")) %>% 
       ## Remove ci columns and convert biomass data
@@ -53,13 +53,13 @@ shinyServer(function(input, output) {
     
     ## Emergence
     emergence <-
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                  "emergence_data.csv"))
     
     ## Table 1 with model water chemistry outputs
     table1 <-
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                           "data",
                                  "table_1.csv")) %>% 
       data.frame(row.names = 1) %>% 
@@ -67,7 +67,7 @@ shinyServer(function(input, output) {
   
     ## Table 2 with model outputs
     table2 <- 
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                  "table_2.csv")) %>% 
       data.frame(row.names = 1) %>% 
@@ -76,14 +76,14 @@ shinyServer(function(input, output) {
     ## Table 3 with number of individual seeded, caught as adult, number of larvae found
     ### a
     table3a <- 
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                  "table_3a.csv")) %>% 
       data.frame(row.names = 1) %>% 
       make_names_nicer()
     ### b
     table3b <- 
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
                                  "data",
                                  "table_3b.csv")) %>% 
       data.frame(row.names = 1) %>% 
@@ -91,7 +91,7 @@ shinyServer(function(input, output) {
     
     ## Table 4 with model outputs
     table4 <- 
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
         "data",
         "table_4.csv")) %>% 
       data.frame(row.names = 1) %>% 
@@ -99,7 +99,7 @@ shinyServer(function(input, output) {
     
     ## Table 5 with model outputs
     table5 <- 
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
         "data",
         "table_5.csv")) %>% 
       data.frame(row.names = 1) %>% 
@@ -107,11 +107,37 @@ shinyServer(function(input, output) {
     
     ## Table 6 with model outputs
     table6 <- 
-      readr::read_csv(here::here(#"brastri", 
+      readr::read_csv(here::here("brastri", 
         "data",
         "table_6.csv")) %>% 
       data.frame(row.names = 1) %>% 
       make_names_nicer()
+    
+    ## Table 7 with model outputs
+    table7 <- 
+      readr::read_csv(here::here("brastri", 
+                                 "data",
+                                 "table_7.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    
+    ## Table 7 with model outputs
+    table8 <- 
+      readr::read_csv(here::here("brastri", 
+                                 "data",
+                                 "table_8.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    
+    ## Table 7 with model outputs
+    table9 <- 
+      readr::read_csv(here::here("brastri", 
+                                 "data",
+                                 "table_9.csv")) %>% 
+      data.frame(row.names = 1) %>% 
+      make_names_nicer()
+    
+  
 
     # Make reactive datasets (subset data for each plot depending on selection) ---------------------------------------------------
     # Plot 1
@@ -394,6 +420,36 @@ shinyServer(function(input, output) {
     # Table 6
     output$table6 <- renderTable(
       {table6}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  na = '',
+      digits = 3, 
+      sanitize.text.function=identity) 
+    
+    # Table 7
+    output$table7 <- renderTable(
+      {table7}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  na = '',
+      digits = 3, 
+      sanitize.text.function=identity) 
+    
+    # Table 8
+    output$table8 <- renderTable(
+      {table8}, 
+      striped = TRUE, bordered = TRUE,  
+      hover = TRUE, spacing = 'l',  
+      width = '100%', align = 'c',  
+      rownames = TRUE,  na = '',
+      digits = 3, 
+      sanitize.text.function=identity) 
+    
+    # Table 9
+    output$table9 <- renderTable(
+      {table9}, 
       striped = TRUE, bordered = TRUE,  
       hover = TRUE, spacing = 'l',  
       width = '100%', align = 'c',  

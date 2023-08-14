@@ -14,13 +14,12 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(here)
-source(here::here(#"brastri",
+source(here::here("brastri",
                   "functions.R"))
 
 # Define UI for application
 shinyUI(navbarPage(
 
-  UPDATE FIGURES
   # First do header
   title = "Data from Pierre's experiments",
   # Style -------------------------------------------------------------------
@@ -288,7 +287,7 @@ shinyUI(navbarPage(
                   box(width = NULL, status = "primary",
                       solidHeader = T, 
                       title = "Figure 4",
-                      h4(strong("Associations of our treatments with different water chemistry variables"),
+                      h4(strong("Marginal effects of our treatments with different water chemistry variables"),
                          style = "display: inline-block; margin-left: 5px; "),
                          p(span("Y-axes of (e) and (f) are on a logarithmic scale, and the x axis of (e) 
                                  differs from that of the other plots, as we did not have a predator 
@@ -328,7 +327,7 @@ shinyUI(navbarPage(
               solidHeader = T, 
               title = "Figure 5",
               column(width = 12,
-              h4(strong("Associations of our treatments with decomposition variables"),
+              h4(strong("Marginal effects of our treatments with decomposition variables"),
                  style = "display: inline-block; margin-left: 5px; "),
               p(span("The two distinct louds of points represent the two different sites,
                       the TT site did not have a predator treatment. In the models, site
@@ -540,9 +539,9 @@ tabPanel("Invertebrate analysis attempt",
                   these analyses include two families that we did not seed at the beginning
                   of the experiment: Psychodidae and Ceratopogonidae.",
                   style = "display: inline-block; margin-left: 5px; ")),
-           ## Second has total biomass emerged
+           ## Second has biomass emerged
            column(12, 
-                 p(h4(strong("Outputs of models on total biomass emerged"),
+                 p(h4(strong("Outputs of models on biomass emerged"),
                  style = "background: #f39c12;margin-left: 0px"))),
            column(12, 
                   p(span("The effect of our treatments on emergence 
@@ -561,30 +560,6 @@ tabPanel("Invertebrate analysis attempt",
                          the total biomass of culicids, tipulids and 
                          ceratopogonids did not vary across treatments.",
                          style = "display: inline-block; margin-left: 5px; "))),
-           column(width = 12,
-                      p(span(strong("Table 4."), "The posterior median values compare to 
-                             a reference state of Resource = control and Predator = absent. pd = probability of direction 
-                             (proportion of the posterior distribution that is of the same sign that the median), 
-                             ROPE = region of practical equivalence (effect size of no practical relevance, here 
-                             twice the standard deviation of the dependent variable around 0). 
-                             Values between parentheses to the right of the median represent the boundaries of the 
-                             95% confidence interval, while under the dependent variable name represent the ROPE itself. 
-                             Significant associations are in boldface.",
-                             style = "display: inline-block; margin-left: 5px; "))),
-           column(width = 12,
-                  tableOutput("table4")),
-           column(12, 
-                  p(span(strong("Figure 9"),
-                  "Associations of our treatments with different 
-                  total biomass emerged at the bromeliad scale"))),
-           column(width = 12,
-                  div(img(src = "fig2.jpg",
-                          height = "100%", width = "100%"), 
-                      style = "text-align: center;")),    
-           ## Third has individual biomass emerged
-           column(12, 
-                  p(h4(strong("Outputs of models on individual body mass of emerged adults."),
-                       style = "background: #f39c12;margin-left: 0px"))),
            column(12, 
                   p(span("In terms of individual body mass, chironomid 
                          individuals were also heavier when emerging from 
@@ -598,8 +573,20 @@ tabPanel("Invertebrate analysis attempt",
                          with enriched leaf litter. Finally, ceratopogonids
                          remained unaffected by either treatment."))),
            column(width = 12,
+                      p(span(strong("Table 4."), "The posterior median values compare to 
+                             a reference state of Resource = control and Predator = absent. pd = probability of direction 
+                             (proportion of the posterior distribution that is of the same sign that the median), 
+                             ROPE = region of practical equivalence (effect size of no practical relevance, here 
+                             twice the standard deviation of the dependent variable around 0). 
+                             Values between parentheses to the right of the median represent the boundaries of the 
+                             95% confidence interval, while under the dependent variable name represent the ROPE itself. 
+                             Significant associations are in boldface.",
+                             style = "display: inline-block; margin-left: 5px; "))),
+           column(width = 12,
+                  tableOutput("table4")),
+           column(width = 12,
                   p(span(strong("Table 5."), 
-                   "The posterior median values compare to 
+                         "The posterior median values compare to 
                    a reference state of Resource = control and Predator = absent. pd = probability of direction 
                    (proportion of the posterior distribution that is of the same sign that the median), 
                    ROPE = region of practical equivalence (effect size of no practical relevance, here 
@@ -610,16 +597,25 @@ tabPanel("Invertebrate analysis attempt",
            column(width = 12,
                   tableOutput("table5")),
            column(12, 
-                  p(span(strong("Figure 10."),
-                  "Associations of our treatments with 
-                  individual body mass of emerged adults"))),
+                  p(span(strong("Figure 9"),
+                  "Marginal effects of our treatments different
+                  biomass and body mass emerged. Refer to tables above for
+                  significance"))),
+           column(width = 12,
+                  div(img(src = "fig2.jpg",
+                          height = "100%", width = "100%"), 
+                      style = "text-align: center;")),    
            column(12, 
-                  div(img(src = "fig4.jpg",
+                  p(span(strong("Figure 10."),
+                  "Marginal effects of our treatments different
+                  biomass and body mass emerged. No significance
+                  in the displayed relationships"))),
+           column(12, 
+                  div(img(src = "figs3.jpg",
                           height = "100%", width = "100%"), 
                       style = "text-align: center;")),
-         
-           
-           ## Fourth introduction of emergence rate analysis
+
+           ## Third of emergence rate analysis
             column(12,
                    p(h4(strong("Outputs of models on number of days until emergence."),
                         style = "background: #f39c12;margin-left: 0px"))),
@@ -640,12 +636,40 @@ tabPanel("Invertebrate analysis attempt",
                   tableOutput("table6")),
            column(12, 
                   p(span(strong("Figure 11."),
-                  "Associations of our treatments with 
+                  "Marginal effects of our treatments with 
                       number of days until emergence"))),
            column(12, 
-                  div(img(src = "fig5.jpg",
+                  div(img(src = "figs4.jpg",
                           height = "100%", width = "100%"), 
                       style = "text-align: center;")),
+         ## Fourth proportion emerged
+         column(12,
+                p(h4(strong("Outputs of models on proportion of larvae emerged as adults."),
+                     style = "background: #f39c12;margin-left: 0px"))),
+         column(width = 12,
+                tableOutput("table7")),
+         column(12, 
+                div(img(src = "figs5.jpg",
+                        height = "100%", width = "100%"), 
+                    style = "text-align: center;")),
+         
+         ## Fifth leftover biomass
+         column(12,
+                p(h4(strong("Outputs of models on biomass leftover as larvae."),
+                     style = "background: #f39c12;margin-left: 0px"))),
+         column(width = 12,
+                tableOutput("table8")),
+         column(width = 12,
+                tableOutput("table9")),
+         column(12, 
+                div(img(src = "fig3.jpg",
+                        height = "100%", width = "100%"), 
+                    style = "text-align: center;")),
+         column(12, 
+                div(img(src = "figs6.jpg",
+                        height = "100%", width = "100%"), 
+                    style = "text-align: center;"))
+         
 
            ))
 ))

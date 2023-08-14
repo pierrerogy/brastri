@@ -499,14 +499,22 @@ time_plot <- function(dats, y){
 
 
 # Make treatment plot -----------------------------------------------------
-treatment_plot <- function(model, parameter, scale = "none",
+treatment_plot <- function(model, parameter, scale = "none", trini = F,
                            bromeliads, communities, 
                            water, emergence){
   # Prepare data
-  ## Effect
+  ## Effect depends on if trini or not 
+  if(!trini){
   model_effect <- 
     brms::conditional_effects(model,
-                              method = "fitted")$`resource:predator`
+                              method = "fitted")[3] %>% 
+    purrr::flatten_df() %>% 
+    dplyr::rename(x2 = contains("pred"))} else 
+    {model_effect <- 
+      brms::conditional_effects(model,
+                                method = "fitted")$resource %>% 
+      dplyr::mutate(x2 = resource)}
+  
   ### Rescale
   if(scale == "log"){
     model_effect <- 
@@ -534,74 +542,77 @@ treatment_plot <- function(model, parameter, scale = "none",
   ylab <- 
     axis_label(parameter = parameter)
   
+  #If site includes regua data
+  if(!trini){
+    # Get x axis label and rename corresponding column in data
+    if("trini" %in% model_effect$x2){
+      namevec <- 
+        c("Regua absent", "Regua present", "Simla")
+      dats <- 
+        dats %>% 
+        dplyr::rename(x2 = site_pred)
+    } else
+      if("trini" %notin% model_effect$x2) {
+        namevec <- 
+          c("Regua absent", "Regua present")
+        dats <- 
+          dats %>% 
+          dplyr::rename(x2 = predator) %>% 
+          dplyr::filter(country == "bras")
+      }} else 
+        if(trini)
+          {namevec <- 
+            c("Control", "Enriched")
+          dats <- 
+            dats %>% 
+            dplyr::mutate(x2 = resource) %>% 
+            dplyr::filter(country == "trini")}
+  
   # Plot
-  ## Little catch for log scale of y axis
-  if(parameter == "Chlorophyll-a") {
-    ret <- 
-      ggplot(data = water,
-             aes(x = predator,
-                 y = y,
-                 colour = resource)) + 
-      geom_jitter(aes(alpha = 0.3)) +
-      geom_point(size = 3,
-                 data = model_effect,
-                 aes(x = predator, 
-                     y = estimate__,
-                     colour = resource), 
-                 position = position_dodge(0.5)) +
-      geom_errorbar(data = model_effect,
-                    aes(ymin = lower__, 
-                        ymax = upper__,
-                        colour = resource), 
-                    width = 0.2,
-                    position = position_dodge(0.5)) +
+  ret <- 
+    ggplot(data = model_effect,
+           aes(x = x2, 
+               y = estimate__), 
+           colour = resource) + 
+    geom_point(size = 4,
+               aes(colour = resource),
+               position = position_dodge(0.5)) +
+    geom_errorbar(aes(ymin = lower__, 
+                      ymax = upper__,
+                      colour = resource), 
+                  width = 0.2,
+                  position = position_dodge(0.5)) +
+    geom_jitter(data = dats,
+                aes(x = x2,
+                    y = y,
+                    colour = resource,
+                    alpha = 0.3)) +
     ggtitle("") +
-    xlab("Predator") +
-    scale_x_discrete(labels = c("Absent", "Present")) +
-    scale_y_continuous(trans = "log",
-                       breaks = c(0.01, 0.5, 1))+  
     ylab(ylab) +
-      scale_color_manual(name = "Resource",
-                         labels = c("Control", "Enriched"), 
-                         values = c("tan1", "tan4")) +
+    scale_x_discrete(labels = namevec) +
+    scale_color_manual(name = "Resource",
+                       labels = c("Control", "Enriched"), 
+                       values = c("tan1", "tan4")) +
     guides(alpha="none") +
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           panel.background = element_blank(), 
-          axis.line = element_line(colour = "black"))} else
-    {ret <- 
-      ggplot(data = model_effect,
-             aes(x = predator, 
-                 y = estimate__), 
-             colour = resource) + 
-      geom_point(size = 4,
-                 aes(colour = resource),
-                 position = position_dodge(0.5)) +
-      geom_errorbar(aes(ymin = lower__, 
-                        ymax = upper__,
-                        colour = resource), 
-                    width = 0.2,
-                    position = position_dodge(0.5)) +
-      geom_jitter(data = dats,
-                 aes(x = predator,
-                     y = y,
-                     colour = resource,
-                     alpha = 0.3)) +
-      ggtitle("") +
-      xlab("Predator") +
-      scale_x_discrete(labels = c("Absent", "Present")) +
-      ylab(ylab) +
-      scale_color_manual(name = "Resource",
-                         labels = c("Control", "Enriched"), 
-                         values = c("tan1", "tan4")) +
-      guides(alpha="none") +
-      theme(panel.grid.major = element_blank(), 
-            panel.grid.minor = element_blank(),
-            panel.background = element_blank(), 
-            axis.line = element_line(colour = "black"))}
-    
-    # Return 
-    return(ret)
+          axis.line = element_line(colour = "black"))
+  
+  # X axis depends on if site includes regua data or not
+  if(!trini){
+    ret <- 
+      ret +
+      xlab("Predator") 
+} else
+    {
+      ret <- 
+        ret +
+        xlab("Resource")
+    }
+  
+  # Return 
+  return(ret)
 
   }
 
@@ -764,7 +775,7 @@ summarise_emergence <- function(dats, bromeliads, group){
   # Combine with bromeliad data to get 0 where nothing emerged
   ret <- 
     bromeliads %>% 
-    dplyr::select(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, contains("pred")) %>% 
     dplyr::left_join(ret,
                      by = c("country", "bromspecies", "bromeliad_id", "resource", "predator")) %>%
     dplyr::mutate(biomass_mg = ifelse(is.na(biomass_mg), 
@@ -786,7 +797,7 @@ summarise_proportion <- function(dats, bromeliads, group){
     ret <- 
       dats %>% 
       dplyr::filter(!stringr::str_detect(string = family,
-                                         pattern = "Psyc|Cera"))
+                                         pattern = "Psyc|Cera|Chir"))
     
   } else{
     # If we want one group in particular
@@ -807,7 +818,7 @@ summarise_proportion <- function(dats, bromeliads, group){
   # Combine with bromeliad data to get 0 where nothing emerged
   ret <- 
     bromeliads %>% 
-    dplyr::select(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, contains("pred")) %>% 
     dplyr::left_join(ret,
                      by = c("country", "bromspecies", "bromeliad_id", "resource", "predator")) %>%
     dplyr::mutate(n = ifelse(is.na(n), 
@@ -899,7 +910,7 @@ summarise_leftover <- function(dats, bromeliads, group){
   # Combine with bromeliad data to get 0 where nothing emerged
   ret <- 
     bromeliads %>% 
-    dplyr::select(country, bromspecies, bromeliad_id, resource, predator) %>% 
+    dplyr::select(country, bromspecies, bromeliad_id, resource, contains("pred")) %>% 
     dplyr::left_join(ret,
                      by = c("country", "bromspecies", "bromeliad_id", "resource", "predator")) %>%
     dplyr::mutate(biomass_mg = ifelse(is.na(biomass_mg), 
