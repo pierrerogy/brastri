@@ -21,7 +21,7 @@ source(here::here("brastri",
 shinyUI(navbarPage(
 
   # First do header
-  title = "Data from Pierre's experiments",
+  title = "A little problem from Pierre's experiments",
   # Style -------------------------------------------------------------------
   tags$style(HTML(".box.box-solid.box-primary>.box-header{background:#f39c12}
                          .box.box-solid.box-primary{}
@@ -230,118 +230,115 @@ shinyUI(navbarPage(
 
 
 
-# Third tab - Water chemistry and decomposition analyses -----------------------------------------------
-  tabPanel("Water chemistry and decomposition",
-           mainPanel(
-          ## First has paragraphs on analyses
-          h3(strong("Effects of treatments on water chemistry and decomposition"),
-             style = "display: inline-block; margin-left: 5px"),
-             p(span("As we have a complex, multilevel dataset, we computed Bayesian, 
-                      multivel models using the “brms” R package (Bürkner, 2017) using un
-                      uniform priors and different random effect combinations depending on 
-                      the specific model. When comparing values at the beginning and/or at 
-                      the end of the experiments, such as biomass accumulation, emergence 
-                      rate or biomass export, we used bromeliad species nested within 
-                      country as random effect. When comparing values across time, such as 
-                      phosphate/ total phosphorus concentration, conductivity, or pH, we 
-                      included bromeliad individual nested within bromeliad species
-                      nested within country, and crossed with day of collection.", br(),
-                   "Our approach differs from frequentist approaches in that we use two 
-                      indices to analyse our model outputs, instead of the lone index of 
-                      effect significance represented by the p-value. The first one, pd 
-                      (probability of 
-                      direction) is concerned with the statistical existence of an effect, 
-                      and represents the proportion of the posterior distribution that is 
-                      of the same sign that the median (Makowski et al., 2019). The second 
-                      one, % in ROPE (percentage in the region of practical equivalence) is 
-                      concerned with effect significance, and represents the percentage of 
-                      the posterior distribution that belongs to the ROPE, region of effect 
-                      sizes so small as to be practically irrelevant (Makowski et al., 2019). 
-                      Here, we compute this region as twice the standard deviation of the 
-                      dependent variable around 0 (Makowski et al., 2019). In this paper, 
-                      we consider as fully significant an association with both pd > 95% and 
-                      % in ROPE < 5%, and as non-significant associations for which with one 
-                      or no such cut-off are met."),
-              style = "display: inline-block; margin-left: 10px; margin-right: 10px;"),
-          ## Second row has output table
-          fluidRow((column(width = 12,
-                           box(width = NULL, status = "primary",
-                               solidHeader = T, 
-                               title = "Table 1",
-                               tableOutput("table1"))))),
-          ## Third has legend of table
-          h4(strong("Posterior tests of water chemistry models."),
-             style = "display: inline-block; margin-left: 5px; "),
-             p(span("The posterior median values compare to a reference state of Resource = control 
-                     and Predator = absent. Empty cells mean that the specific independent variable, 
-                     was not used in a given model. pd = probability of direction (proportion of the 
-                     posterior distribution that is of the same sign that the median), ROPE = region of 
-                     practical equivalence (effect size of no practical relevance, here twice the 
-                     standard deviation of the dependent variable around 0). Values between parentheses 
-                     to the right of the median represent the boundaries of the 95% confidence interval,
-                     while under the dependent variable name represent the ROPE itself. 
-                     Significant associations are in boldface."),
-               style = "display: inline-block; margin-left: 10px; "),
-          ## Fourth has plot legend
-          column(width = 12,
-                  box(width = NULL, status = "primary",
-                      solidHeader = T, 
-                      title = "Figure 4",
-                      h4(strong("Marginal effects of our treatments with different water chemistry variables"),
-                         style = "display: inline-block; margin-left: 5px; "),
-                         p(span("Y-axes of (e) and (f) are on a logarithmic scale, and the x axis of (e) 
-                                 differs from that of the other plots, as we did not have a predator 
-                                 treatment at the TT site (see methods).", br(),
-                                "Here, we have two significant effects: in BR, the 
-                                presence of damselfly predator reduces the total P 
-                                concentration in the water, while in TT, enriching the 
-                                resource in P lead to higher phosphate in the water."),
-                           style = "display: inline-block; margin-left: 10px; "))),
-          ## Fifth has figure 4
-          box(width = NULL, status = "primary",
-              solidHeader = F, 
-              column(12, 
-                     div(img(src = "figs1.jpg",
-                             height = "100%", width = "100%"), 
-                         style = "text-align: center;"))),
-          ## Sixth row has table
-          fluidRow((column(width = 12,
-                           box(width = NULL, status = "primary",
-                               solidHeader = T, 
-                               title = "Table 2",
-                               tableOutput("table2"))))),
-          ## Seventh has legend
-          h4(strong("Posterior tests of decomposition models."),
-             style = "display: inline-block; margin-left: 5px; "),
-             p(span("The posterior median values compare to a reference state of Resource = control 
-                     and Predator = absent. pd = probability of direction (proportion of the 
-                     posterior distribution that is of the same sign that the median), ROPE = region of 
-                     practical equivalence (effect size of no practical relevance, twice the 
-                     standard deviation of the dependent variable around 0). Values between parentheses 
-                     to the right of the median represent the boundaries of the 95% confidence interval,
-                     while under the dependent variable name represent the ROPE itself. 
-                     Significant associations are in boldface."),
-                 style = "display: inline-block; margin-left: 10px; "),
-          ## Eigth has plot legend
-          box(width = NULL, status = "primary",
-              solidHeader = T, 
-              title = "Figure 5",
-              column(width = 12,
-              h4(strong("Marginal effects of our treatments with decomposition variables"),
-                 style = "display: inline-block; margin-left: 5px; "),
-              p(span("The two distinct louds of points represent the two different sites,
-                      the TT site did not have a predator treatment. In the models, site
-                      is included as a random variable, in which bromeliad species and
-                      is nested. We have here large, overlapping confidence 
-                     intervals, but the model still picked a negative effect of
-                     resource enrichment on microbial decomposition."),
-                style = "display: inline-block; margin-left: 10px; "))),
-          ## Ninth row has figure 2
-          column(12, 
-                 div(img(src = "figs2.jpg",
-                         height = "100%", width = "100%"), 
-                     style = "text-align: center;")),
-        )),
+# # Third tab - Water chemistry and decomposition analyses -----------------------------------------------
+#   tabPanel("Water chemistry and decomposition",
+#            mainPanel(
+#           ## First has paragraphs on analyses
+#           h3(strong("Effects of treatments on water chemistry and decomposition"),
+#              style = "display: inline-block; margin-left: 5px"),
+#              p(span("As we have a complex, multilevel dataset, we computed Bayesian, 
+#                       multivel models using the “brms” R package (Bürkner, 2017) using un
+#                       uniform priors and different random effect combinations depending on 
+#                       the specific model. When comparing values at the beginning and/or at 
+#                       the end of the experiments, such as biomass accumulation, emergence 
+#                       rate or biomass export, we used bromeliad species nested within 
+#                       country as random effect. When comparing values across time, such as 
+#                       phosphate/ total phosphorus concentration, conductivity, or pH, we 
+#                       included bromeliad individual nested within bromeliad species
+#                       nested within country, and crossed with day of collection.", br(),
+#                    "Our approach differs from frequentist approaches in that we use two 
+#                       indices to analyse our model outputs, instead of the lone index of 
+#                       effect significance represented by the p-value. The first one, pd 
+#                       (probability of 
+#                       direction) is concerned with the statistical existence of an effect, 
+#                       and represents the proportion of the posterior distribution that is 
+#                       of the same sign that the median (Makowski et al., 2019). The second 
+#                       one, % in ROPE (percentage in the region of practical equivalence) is 
+#                       concerned with effect significance, and represents the percentage of 
+#                       the posterior distribution that belongs to the ROPE, region of effect 
+#                       sizes so small as to be practically irrelevant (Makowski et al., 2019). 
+#                       Here, we compute this region as twice the standard deviation of the 
+#                       dependent variable around 0 (Makowski et al., 2019). In this paper, 
+#                       we consider as fully significant an association with both pd > 95% and 
+#                       % in ROPE < 5%, and as non-significant associations for which with one 
+#                       or no such cut-off are met."),
+#               style = "display: inline-block; margin-left: 10px; margin-right: 10px;"),
+#           ## Second row has output table
+#           fluidRow((column(width = 12,
+#                            box(width = NULL, status = "primary",
+#                                solidHeader = T, 
+#                                title = "Table 1",
+#                                tableOutput("table1"))))),
+#           ## Third has legend of table
+#           h4(strong("Posterior tests of water chemistry models."),
+#              style = "display: inline-block; margin-left: 5px; "),
+#              p(span("The posterior median values compare to a reference state of Resource = control 
+#                      and Predator = absent. Empty cells mean that the specific independent variable, 
+#                      was not used in a given model. pd = probability of direction (proportion of the 
+#                      posterior distribution that is of the same sign that the median), ROPE = region of 
+#                      practical equivalence (effect size of no practical relevance, here twice the 
+#                      standard deviation of the dependent variable around 0). Values between parentheses 
+#                      to the right of the median represent the boundaries of the 95% credible interval,
+#                      while under the dependent variable name represent the ROPE itself. 
+#                      Significant associations are in boldface."),
+#                style = "display: inline-block; margin-left: 10px; "),
+#           ## Fourth has plot legend
+#           column(width = 12,
+#                   box(width = NULL, status = "primary",
+#                       solidHeader = T, 
+#                       title = "Figure 4",
+#                       h4(strong("Conditional effects of our treatments with different water chemistry variables"),
+#                          style = "display: inline-block; margin-left: 5px; "),
+#                          p(span("Y-axes of (e) and (f) are on a logarithmic scale, and the x axis of (e) 
+#                                  differs from that of the other plots, as we did not have a predator 
+#                                  treatment at the TT site (see methods).", br(),
+#                                 "Here, we have two significant effects: in BR, the 
+#                                 presence of damselfly predator reduces the total P 
+#                                 concentration in the water, while in TT, enriching the 
+#                                 resource in P lead to higher phosphate in the water."),
+#                            style = "display: inline-block; margin-left: 10px; "))),
+#           ## Fifth has figure 4
+#           box(width = NULL, status = "primary",
+#               solidHeader = F, 
+#               column(12, 
+#                      div(img(src = "figs1.jpg",
+#                              height = "100%", width = "100%"), 
+#                          style = "text-align: center;"))),
+#           ## Sixth row has table
+#           fluidRow((column(width = 12,
+#                            box(width = NULL, status = "primary",
+#                                solidHeader = T, 
+#                                title = "Table 2",
+#                                tableOutput("table2"))))),
+#           ## Seventh has legend
+#           h4(strong("Posterior tests of decomposition models."),
+#              style = "display: inline-block; margin-left: 5px; "),
+#              p(span("The posterior median values compare to a reference state of Resource = control 
+#                      and Predator = absent. pd = probability of direction (proportion of the 
+#                      posterior distribution that is of the same sign that the median), ROPE = region of 
+#                      practical equivalence (effect size of no practical relevance). Values between parentheses 
+#                      to the right of the median represent the boundaries of the 95% credible interval,
+#                      while under the dependent variable name represent the ROPE itself. 
+#                      Significant associations are in boldface."),
+#                  style = "display: inline-block; margin-left: 10px; "),
+#           ## Eigth has plot legend
+#           box(width = NULL, status = "primary",
+#               solidHeader = T, 
+#               title = "Figure 5",
+#               column(width = 12,
+#               h4(strong("Conditional effects of our treatments with decomposition variables"),
+#                  style = "display: inline-block; margin-left: 5px; "),
+#               p(span("Decomposition was higher at Simla, although there was no relative difference
+#                      of effects between the two sites. The presence of predators increased decomposition in
+#                      both mesh sizes, but, given the very similar values, this effect seems to be restricted
+#                      to microbial decomposition."),
+#                 style = "display: inline-block; margin-left: 10px; "))),
+#           ## Ninth row has figure 2
+#           column(12, 
+#                  div(img(src = "fig2.jpg",
+#                          height = "100%", width = "100%"), 
+#                      style = "text-align: center;")),
+#         )),
 # Fourth tab - Problem with invertebrates -----------------------------------------------
 tabPanel("A problem with invertebrates",
          mainPanel(
@@ -516,162 +513,6 @@ tabPanel("A problem with invertebrates",
                            a better way in mind!",
                       style = "display: inline-block; margin-left: 5px; "))),
          )),
-# Fifth tab - Invertebrate analysis attempt -----------------------------------------------
-tabPanel("Invertebrate analysis attempt",
-         mainPanel(
-           ## First explication of the attempts
-           h3(strong("Attempt at analysing invertebrate data"),
-              style = "display: inline-block; margin-left: 5px;"),
-           p(span("I decided to proceed first with the emergence data, as the problem
-                  was easier to solve. Here, I used a combined approach to decide if an
-                  adult insect was likely to have emerged from a bromeliad. First, we
-                  raised larvae from bromeliads, to compare the adult stages of these larvae
-                  to those we may have found in the bromeliad. But some larva are tricky to raise,
-                  so we were not able to get adults for all species, in particular for chironomids
-                  and ceratopogonids, we thus considered all members of these families as having
-                  emerged from the bromeliads. ", br(),
-                  "I have divided the analysis concerning the biomass at emergence in two 
-                  parts, one where I have summed up the biomasses of all individuals within a 
-                  family (total biomass emerged), and the other where I have kept individual 
-                  biomasses (individual biomass emerged). While the first part gives us an 
-                  idea of how much biomass export varies amongst treatment, the second ones 
-                  gives us an idea of how individuals may vary across treatments. Note that 
-                  these analyses include two families that we did not seed at the beginning
-                  of the experiment: Psychodidae and Ceratopogonidae.",
-                  style = "display: inline-block; margin-left: 5px; ")),
-           ## Second has biomass emerged
-           column(12, 
-                 p(h4(strong("Outputs of models on biomass emerged"),
-                 style = "background: #f39c12;margin-left: 0px"))),
-           column(12, 
-                  p(span("The effect of our treatments on emergence 
-                         differed amongst groups. First, there was no 
-                         effect on the overall biomass of bromeliad-
-                         associated insects captured within the emergence 
-                         traps, nor on the total biomass of insects from 
-                         groups seeded at the beginning of the experiment.
-                         At the family level, the total emerged biomass of
-                         chironomids responded to our treatments in an 
-                         interactive manner. There was less chironomid
-                         biomass emerging in the presence of a predator 
-                         when the resource was not enriched in P, but, 
-                         when the resource was enriched in P, there was 
-                         more chironomid biomass emerging. On the other hand, 
-                         the total biomass of culicids, tipulids and 
-                         ceratopogonids did not vary across treatments.",
-                         style = "display: inline-block; margin-left: 5px; "))),
-           column(12, 
-                  p(span("In terms of individual body mass, chironomid 
-                         individuals were also heavier when emerging from 
-                         bromeliads with predators and having received 
-                         enriched litter as resource. In the presence of 
-                         predators, culicids emerged smaller if the 
-                         resource was control, but larger if the resource 
-                         was enriched in P. Tipulids showed a different 
-                         pattern, as their body mass was smaller when 
-                         emerging from bromeliads without predators and 
-                         with enriched leaf litter. Finally, ceratopogonids
-                         remained unaffected by either treatment."))),
-           column(width = 12,
-                      p(span(strong("Table 4."), "The posterior median values compare to 
-                             a reference state of Resource = control and Predator = absent. pd = probability of direction 
-                             (proportion of the posterior distribution that is of the same sign that the median), 
-                             ROPE = region of practical equivalence (effect size of no practical relevance, here 
-                             twice the standard deviation of the dependent variable around 0). 
-                             Values between parentheses to the right of the median represent the boundaries of the 
-                             95% confidence interval, while under the dependent variable name represent the ROPE itself. 
-                             Significant associations are in boldface.",
-                             style = "display: inline-block; margin-left: 5px; "))),
-           column(width = 12,
-                  tableOutput("table4")),
-           column(width = 12,
-                  p(span(strong("Table 5."), 
-                         "The posterior median values compare to 
-                   a reference state of Resource = control and Predator = absent. pd = probability of direction 
-                   (proportion of the posterior distribution that is of the same sign that the median), 
-                   ROPE = region of practical equivalence (effect size of no practical relevance, here 
-                   twice the standard deviation of the dependent variable around 0). 
-                   Values between parentheses to the right of the median represent the boundaries of the 
-                   95% confidence interval, while under the dependent variable name represent the ROPE itself. 
-                   Significant associations are in boldface."))),
-           column(width = 12,
-                  tableOutput("table5")),
-           column(12, 
-                  p(span(strong("Figure 9"),
-                  "Marginal effects of our treatments different
-                  biomass and body mass emerged. Refer to tables above for
-                  significance"))),
-           column(width = 12,
-                  div(img(src = "fig2.jpg",
-                          height = "100%", width = "100%"), 
-                      style = "text-align: center;")),    
-           column(12, 
-                  p(span(strong("Figure 10."),
-                  "Marginal effects of our treatments different
-                  biomass and body mass emerged. No significance
-                  in the displayed relationships"))),
-           column(12, 
-                  div(img(src = "figs3.jpg",
-                          height = "100%", width = "100%"), 
-                      style = "text-align: center;")),
-
-           ## Third of emergence rate analysis
-            column(12,
-                   p(h4(strong("Outputs of models on number of days until emergence."),
-                        style = "background: #f39c12;margin-left: 0px"))),
-         column(12, 
-                p(span("Our treatments did not influence the rate at which 
-                         organisms emerged from the bromeliads "))),
-           column(width = 12,
-                  p(span(strong("Table 6."), 
-                  "The posterior median values compare to 
-                  a reference state of Resource = control and Predator = absent. pd = probability of direction 
-                  (proportion of the posterior distribution that is of the same sign that the median), 
-                  ROPE = region of practical equivalence (effect size of no practical relevance, here 
-                  twice the standard deviation of the dependent variable around 0). 
-                  Values between parentheses to the right of the median represent the boundaries of the 
-                  95% confidence interval, while under the dependent variable name represent the ROPE itself. 
-                  Significant associations are in boldface."))),
-           column(width = 12,
-                  tableOutput("table6")),
-           column(12, 
-                  p(span(strong("Figure 11."),
-                  "Marginal effects of our treatments with 
-                      number of days until emergence"))),
-           column(12, 
-                  div(img(src = "figs4.jpg",
-                          height = "100%", width = "100%"), 
-                      style = "text-align: center;")),
-         ## Fourth proportion emerged
-         column(12,
-                p(h4(strong("Outputs of models on proportion of larvae emerged as adults."),
-                     style = "background: #f39c12;margin-left: 0px"))),
-         column(width = 12,
-                tableOutput("table7")),
-         column(12, 
-                div(img(src = "figs5.jpg",
-                        height = "100%", width = "100%"), 
-                    style = "text-align: center;")),
-         
-         ## Fifth leftover biomass
-         column(12,
-                p(h4(strong("Outputs of models on biomass leftover as larvae."),
-                     style = "background: #f39c12;margin-left: 0px"))),
-         column(width = 12,
-                tableOutput("table8")),
-         column(width = 12,
-                tableOutput("table9")),
-         column(12, 
-                div(img(src = "fig3.jpg",
-                        height = "100%", width = "100%"), 
-                    style = "text-align: center;")),
-         column(12, 
-                div(img(src = "figs6.jpg",
-                        height = "100%", width = "100%"), 
-                    style = "text-align: center;"))
-         
-
-           ))
 ))
     
 
