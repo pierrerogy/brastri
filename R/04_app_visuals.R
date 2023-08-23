@@ -10,7 +10,15 @@ source(here::here("brastri",
 # Plot of everything that emerged  ------------------
 # Prepare data
 dats <- 
-  emergence %>% 
+  readr::read_csv(here::here("brastri", "data",
+                             "emergence_data.csv")) %>%
+  ## Make custom species name
+  get_specnames() %>%
+  ## Add new treatment
+  dplyr::mutate(site_pred = factor(ifelse(country == "trini",
+                                          "trini", ifelse(country == "bras" & predator == "present",
+                                                          "bras_present", "bras_absent")),
+                                   levels = c("bras_absent", "bras_present", "trini"))) %>% 
   ## Let's group species by family to make plot legible
   dplyr::mutate(family = ifelse(is.na(family),
                                 "uk", family),
@@ -57,8 +65,8 @@ figure6 <-
   geom_bar(stat="identity") +
   facet_wrap(~country,
              labeller = labeller(country = 
-                                   c("bras" = "BR",
-                                     "trini" = "TT"))) +
+                                   c("bras" = "Regua",
+                                     "trini" = "Simla"))) +
   xlab("") +
   ylab("Amount collected") +
   theme(axis.text.x = element_markdown(angle = 90,
@@ -78,13 +86,18 @@ ggsave(here::here("brastri", "www",
 # Plot of initial biomasses -----------------------------------------------
 # Make dats
 dats <- 
-  community %>% 
+  readr::read_csv(here::here("brastri", "data",
+                             "community_data.csv")) %>% 
+  ## Remove ci columns
+  dplyr::select(-contains("ci_"), -path,  -day) %>% 
   dplyr::filter(when == "start" & ord != "Odonata") %>% 
   dplyr::select(-when, -bromspecies) %>%
   ## Make species name for plotting
   get_specnames() %>% 
-  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu"),
-                                 "Tipulidae", species),
+  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu|Diptera_sp1"),
+                                 "Tipulidae", ifelse(
+                                   stringr::str_detect(string = species, pattern = "Polyped"), 
+                                   "Polypedilum", species)),
                 biomass_mg = as.numeric(biomass_mg)) %>% 
   dplyr::select(country, species, biomass_mg) %>% 
   ## Summarise by site
@@ -92,15 +105,15 @@ dats <-
   dplyr::summarise(dplyr::across(biomass_mg,
                                  list(sum = sum, sd = sd))) %>% 
   ## Reorder species name as factor, whose level follows growth rate
-  dplyr::mutate(species = factor(species, levels = c("Scirtidae_Scirtes", "Tipulidae", 
-                                                     "Chironomidae_Tanypodinae", "Chironominae_Polypedilum", 
-                                                     "Culicidae_Weomyia")))
+  dplyr::mutate(species = factor(species, levels = c("Scirtes_sp1", "Tipulidae", 
+                                                     "Diptera_Tanypodinae", "Polypedilum", 
+                                                     "Culicidae_Wyeomyia")))
 
 # Make list of picture labels
-labels <- c(Chironomidae_Tanypodinae = "<img src='brastri/www/chir.jpg' width='25' /><br>",
-            Chironominae_Polypedilum = "<img src='brastri/www/chir.jpg' width='25' /><br>",
-            Culicidae_Weomyia = "<img src='brastri/www/culi.jpg' width='25' /><br>",
-            Scirtidae_Scirtes = "<img src='brastri/www/scir.jpg' width='25' /><br>",
+labels <- c(Diptera_Tanypodinae = "<img src='brastri/www/chir.jpg' width='25' /><br>",
+            Polypedilum = "<img src='brastri/www/chir.jpg' width='25' /><br>",
+            Culicidae_Wyeomyia = "<img src='brastri/www/culi.jpg' width='25' /><br>",
+            Scirtes_sp1 = "<img src='brastri/www/scir.jpg' width='25' /><br>",
             Tipulidae = "<img src='brastri/www/tipu.jpg' width='25' /><br>") # replace with whatever
 
 # Make plot
@@ -113,8 +126,8 @@ biomass_plot_before <-
                     ymax = biomass_mg_sum + biomass_mg_sd), width = 0.2) +
   facet_wrap(~country,
              labeller = labeller(country = 
-                                   c("bras" = "BR",
-                                     "trini" = "TT"))) +
+                                   c("bras" = "Regua",
+                                     "trini" = "Simla"))) +
   xlab("") +
   ylab("Estimated dry mass(mg)") +
   ylim(0,11) +
@@ -136,18 +149,23 @@ ggsave(here::here("brastri", "www",
 # Plots of final biomasses ------------------------------------------------
 # Make dats
 dats <- 
-  community %>% 
-  dplyr::filter(when == "end") %>% 
-  dplyr::select(-when) %>%
+  readr::read_csv(here::here("brastri", "data",
+                             "community_data.csv")) %>% 
+  ## Remove ci columns
+  dplyr::select(-contains("ci_"), -path,  -day) %>% 
+  dplyr::filter(when == "end" & ord != "Odonata") %>% 
+  dplyr::select(-when, -bromspecies) %>% 
   ## Add unknown class for all those unknown species
   dplyr::mutate(class = ifelse(is.na(class),
                                "unknown", class)) %>% 
   ## Make species name for plotting
   get_specnames() %>% 
-  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu"),
-                                 "Tipulidae", species),
+  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu|Diptera_sp1"),
+                                 "Tipulidae", ifelse(
+                                   stringr::str_detect(string = species, pattern = "Polyped"), 
+                                   "Polypedilum", species)),
                 biomass_mg = as.numeric(biomass_mg)) %>% 
-  dplyr::select(country:species) %>% 
+  dplyr::select(country, species, biomass_mg) %>% 
   ## Summarise by site
   group_by(country, species) %>% 
   dplyr::summarise(dplyr::across(biomass_mg,
@@ -156,10 +174,10 @@ dats <-
 
 # Plot 1 groups that we seeded at the beginning of the expt
 ## Make list of picture labels
-labels <- c(Chironomidae_Tanypodinae = "<img src='brastri/www/chir.jpg' width='25' /><br>",
-            Chironominae_Polypedilum = "<img src='brastri/www/chir.jpg' width='25' /><br>",
-            Culicidae_Weomyia = "<img src='brastri/www/culi.jpg' width='25' /><br>",
-            Scirtidae_Scirtes = "<img src='brastri/www/scir.jpg' width='25' /><br>",
+labels <- c(Diptera_Tanypodinae = "<img src='brastri/www/chir.jpg' width='25' /><br>",
+            Polypedilum = "<img src='brastri/www/chir.jpg' width='25' /><br>",
+            Culicidae_Wyeomyia = "<img src='brastri/www/culi.jpg' width='25' /><br>",
+            Scirtes_sp1 = "<img src='brastri/www/scir.jpg' width='25' /><br>",
             Tipulidae = "<img src='brastri/www/tipu.jpg' width='25' /><br>") # replace with whatever
 
 ## Make plot
@@ -167,13 +185,13 @@ biomass_plot_after <-
   ggplot(data = 
            dats %>% 
            ## filter the groups I want
-           dplyr::filter(species %in% c("Scirtidae_Scirtes", "Tipulidae", 
-                                        "Chironomidae_Tanypodinae", "Chironominae_Polypedilum", 
-                                        "Culicidae_Weomyia")) %>% 
+           dplyr::filter(species %in% c("Scirtes_sp1", "Tipulidae", 
+                                        "Diptera_Tanypodinae", "Polypedilum", 
+                                        "Culicidae_Wyeomyia")) %>% 
            ## Reorder species name as factor, whose level follows growth rate
-           dplyr::mutate(species = factor(species, levels = c("Scirtidae_Scirtes", "Tipulidae", 
-                                                              "Chironomidae_Tanypodinae", "Chironominae_Polypedilum", 
-                                                              "Culicidae_Weomyia"))),
+           dplyr::mutate(species = factor(species, levels = c("Scirtes_sp1", "Tipulidae", 
+                                                              "Diptera_Tanypodinae", "Polypedilum", 
+                                                              "Culicidae_Wyeomyia"))),
          aes(x = species,
              y =  biomass_mg_sum)) +
   geom_point() +
@@ -181,8 +199,8 @@ biomass_plot_after <-
                     ymax = biomass_mg_sum + biomass_mg_sd), width = 0.2) +
   facet_wrap(~country,
              labeller = labeller(country = 
-                                   c("bras" = "BR",
-                                     "trini" = "TT"))) +
+                                   c("bras" = "Regua",
+                                     "trini" = "Simla"))) +
   xlab("") +
   ylab("Estimated dry mass(mg)") +
   scale_x_discrete(labels = labels) +
@@ -206,9 +224,9 @@ biomass_plot_after_tourists <-
   ggplot(data = 
            dats %>% 
            ## filter the groups I want
-           dplyr::filter(species %notin% c("Scirtidae_Scirtes", "Tipulidae", 
-                                           "Chironomidae_Tanypodinae", "Chironominae_Polypedilum", 
-                                           "Culicidae_Weomyia", "Odonata_Coenagrionidae")) %>% 
+           dplyr::filter(species %notin% c("Scirtes_sp1", "Tipulidae", 
+                                           "Diptera_Tanypodinae", "Polypedilum", 
+                                           "Culicidae_Wyeomyia")) %>% 
            ## edit the names for easier reading
            dplyr::mutate(species = stringr::str_remove(string = species, 
                                                        pattern = ".*_")),
@@ -219,8 +237,8 @@ biomass_plot_after_tourists <-
                     ymax = biomass_mg_sum + biomass_mg_sd), width = 0.2) +
   facet_wrap(~country,
              labeller = labeller(country = 
-                                   c("bras" = "BR",
-                                     "trini" = "TT"))) +
+                                   c("bras" = "Regua",
+                                     "trini" = "Simla"))) +
   xlab("") +
   ylab("Estimated dry mass(mg)") +
   theme(axis.text.x = element_text(angle = 90),
@@ -243,13 +261,13 @@ ggsave(here::here("brastri", "www",
 # Table of how many larvae seeded, emerged, found, missing --------
 # Make first part of table
 table3 <- 
-  tibble::tibble(species = rep(x = c("Scirtidae_Scirtes", "Tipulidae",
-                                     "Chironomidae_Tanypodinae", "Chironominae_Polypedilum", 
-                                     "Culicidae_Weomyia", "Odonata_Coenagrionidae"), 
+  tibble::tibble(species = rep(x = c("Scirtes_sp1", "Tipulidae", 
+                                     "Diptera_Tanypodinae", "Polypedilum", 
+                                     "Culicidae_Wyeomyia", "Odonata_Coenagrionidae"), 
                                times = 2),
                  org = rep(x = c("<i>Scirtes</i>", "Tipulidae",
                                  "Tanypodinae", "<i>Polypedilum</i>", 
-                                 "<i>Weomyia</i>", "Coenagrionidae"), 
+                                 "<i>Wyeomyia</i>", "Coenagrionidae"), 
                            times = 2),
                  country = rep(x = c("bras", "trini"),
                                each = 6),
@@ -259,7 +277,15 @@ table3 <-
 # Add how many emerged
 ## Keep those species for which we had at least one body mass measurement
 emergence_selected <- 
-  emergence %>% 
+  readr::read_csv(here::here("brastri", "data",
+                             "emergence_data.csv")) %>% 
+  ## Rename one column for the time being
+  dplyr::rename(bromeliad = bromspecies,
+                biomass_mg = dry_mass_mg) %>% 
+  ## Make custom species name
+  get_specnames() %>% 
+  ## Back to original species name
+  dplyr::rename(bromspecies = bromeliad) %>% 
   dplyr::filter(species %in% (emergence %>% 
                                 dplyr::filter(!is.na(biomass_mg)) %>% 
                                 dplyr::select(species) %>% 
@@ -274,6 +300,7 @@ emergence_selected <-
   ## Get biomass for missing values
   hellometry::add_taxonomy() %>% 
   hellometry::hello_metry()
+
 ## Do the cleaning 
 temp1 <- 
   emergence_selected %>% 
@@ -289,23 +316,32 @@ temp1 <-
   dplyr::tally() %>% 
   dplyr::rename(Emerged = n) %>% 
   ## Now give the same names than in the other data frames
-  dplyr::mutate(species = ifelse(species == "Coenagrionidae",
-                                 "Odonata_Coenagrionidae", ifelse(species == "Chironomidae",
-                                                                  "Chironominae_Polypedilum" , ifelse(species == "Culicidae",
-                                                                                                      "Culicidae_Weomyia" , "Tipulidae"))))
+  dplyr::mutate(species = ifelse(species == "Hexapoda_Odonata",
+                                 "Hexapoda_Odonata", ifelse(species == "Chironomidae",
+                                                                  "Polypedilum" , ifelse(species == "Culicidae",
+                                                                                                      "Culicidae_Wyeomyia" , "Tipulidae"))))
 
 # Add how many were found at the end
 temp2 <- 
-  community %>% 
+  readr::read_csv(here::here("brastri", "data",
+                             "community_data.csv")) %>% 
+  ## Remove ci columns
+  dplyr::select(-contains("ci_"), -path,  -day) %>% 
   dplyr::filter(when == "end") %>% 
+  dplyr::select(-when, -bromspecies) %>% 
+  ## Add unknown class for all those unknown species
+  dplyr::mutate(class = ifelse(is.na(class),
+                               "unknown", class)) %>% 
   ## Make species name for plotting
   get_specnames() %>% 
-  ## Filter the species we want
-  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu"),
-                                 "Tipulidae", species)) %>% 
-  dplyr::filter((species %in% c("Tipulidae", "Odonata_Coenagrionidae",
-                                "Chironomidae_Tanypodinae", "Chironominae_Polypedilum") & country == "bras") |
-                  (species %in% c("Scirtidae_Scirtes", "Tipulidae", "Chironominae_Polypedilum") &
+  dplyr::mutate(species = ifelse(stringr::str_detect(string = species, pattern = "Tipu|Diptera_sp1"),
+                                 "Tipulidae", ifelse(
+                                   stringr::str_detect(string = species, pattern = "Polyped"), 
+                                   "Polypedilum", species)),
+                biomass_mg = as.numeric(biomass_mg)) %>% 
+    dplyr::filter((species %in% c("Tipulidae", "Hexapoda_Odonata", "Culicidae_Wyeomyia",
+                                "Diptera_Tanypodinae", "Polypedilum") & country == "bras") |
+                  (species %in% c("Scirtes_sp1", "Tipulidae", "Polypedilum") &
                      country == "trini")) %>% 
   ## Sum across sites
   dplyr::select(country, species) %>% 

@@ -14,7 +14,7 @@ library(shiny)
 library(shinydashboard)
 library(shinyWidgets)
 library(here)
-source(here::here("brastri",
+source(here::here(#"brastri",
                   "functions.R"))
 
 # Define UI for application
@@ -52,9 +52,9 @@ shinyUI(navbarPage(
              style = "display: inline-block; margin-left: 5px; font-family: Sylfaen"),
           span(strong("(a)"), "The first step of our experimental design consisted in seeding bromeliads
           under emergence traps with experimental (Exp.) communities based on a large census 
-          of wild bromeliads in Trinidad-and-Tobago (SIMLA) and Brasil (REGUA). The SIMLA community was 
+          of wild bromeliads in Trinidad-and-Tobago (Simla) and Brasil (Regua). The Simla community was 
           composed of fives", em("Scirtes"), "sp. (Coleoptera: Scirtidae), three Tipulid sp. 
-          (Diptera: Tipulidae), and one", em("Polypedilum"), "sp. (Diptera: Chironomidae), and, in REGUA, 
+          (Diptera: Tipulidae), and one", em("Polypedilum"), "sp. (Diptera: Chironomidae), and, in Regua, 
           of three", em("Trentepholia"), "sp. (Diptera: Tipulidae), one Tanypodinae sp. 
           (Diptera: Chironomidae), four", em("Polypedilum"), "sp. (Diptera: Chironomidae), and seven 
           Culicinae sp. (Diptera: Culicidae). We then randomly attributed bromeliads to a 
@@ -364,7 +364,7 @@ tabPanel("A problem with invertebrates",
            ## Second has figure of what we found in the traps, all the families,
            ## highlighting the ones from the beginning
            box(width = NULL, status = "primary", collapsible = F,
-               title  = "Figure 6", solidHeader = T,
+               title  = "Figure 4", solidHeader = T,
                div(img(src = "emergence_everything.jpg",
                        height = "100%", width = "100%"), 
                    style = "text-align: center;")),
@@ -377,7 +377,7 @@ tabPanel("A problem with invertebrates",
              style = "display: inline-block; margin-left: 5px; "),
            ## Fourth has text on the problem that we have with tourists that made it in
            box(width = NULL, status = "primary", collapsible = F,
-               title  = "Figure 7", solidHeader = T,
+               title  = "Figure 5", solidHeader = T,
                h4(strong("A little problem..."),
               style = "display: inline-block; margin-left: 5px; "),
               p(span("However we have a little problem. Beyond tourists organisms 
@@ -455,15 +455,15 @@ tabPanel("A problem with invertebrates",
                        at the end of the experiment or emerged and died on the ground
                        without making it to the emergence trap."),
                       style = "display: inline-block; margin-left: 5px;")),
-           ## Tenth has table 3a and b
+           ## Tenth has table 1a and b
            box(width = NULL, status = "primary", collapsible = F,
-               title  = "Table 3", solidHeader = T,
+               title  = "Table 1", solidHeader = T,
                column(width = 6,
                       tableOutput("table3a")),
                column(width = 6,
                       tableOutput("table3b"))),
            ## Eleventh has table legend
-           h4(strong("Seeding and collection patterns for BR (left) and TT (right)"),
+           h4(strong("Seeding and collection patterns for Regua (left) and Simla (right)"),
               style = "display: inline-block; margin-left: 5px; "),
            p(span("We compare here the number of individuals in each species seeded
                   at the beginning of the experiment to the number that emerged during the
@@ -477,7 +477,7 @@ tabPanel("A problem with invertebrates",
            fluidRow(column(12, 
                            box(width = NULL, status = "primary",
                                solidHeader = T, 
-                               title = "Figure 8",
+                               title = "Figure 7",
                                p(h4(strong("Biomass of organisms remaining within bromeliads at the end of the experiment."),
                                      style = "display: inline-block; margin-left: 5px; "),
                                  br(),
@@ -512,7 +512,7 @@ tabPanel("A problem with invertebrates",
                            wants to participate more can do it effectively. Please let me knwo if you have
                            a better way in mind!",
                       style = "display: inline-block; margin-left: 5px; "))),
-         )),
+         ))
 ))
     
 

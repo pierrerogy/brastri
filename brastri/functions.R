@@ -328,43 +328,43 @@ axis_label <- function(parameter){
   
   if(parameter == "leftover_all")
     ret <- 
-      "Total dry biomass leftover (mg)"
+      "Total dry biomass remaining (mg)"
   
   if(parameter == "leftover_seed")
     ret <- 
-      "Total dry biomass leftover \nfrom seeded groups (mg)"
+      "Total dry biomass remaining \nfrom seeded groups (mg)"
   
   if(parameter == "leftover_chir_tot")
     ret <- 
-      "Total dry biomass of \nleftover chironomids (mg)"
+      "Total dry biomass of \nremaining chironomids (mg)"
   
   if(parameter == "leftover_culi_tot")
     ret <- 
-      "Total dry biomass of \nleftover culicids (mg)"
+      "Total dry biomass of \nremaining culicids (mg)"
   
   if(parameter == "leftover_scir_tot")
     ret <- 
-      "Total dry biomass of \nleftover scirtids (mg)"
+      "Total dry biomass of \nremaining scirtids (mg)"
   
   if(parameter == "leftover_tipu_tot")
     ret <- 
-      "Total dry biomass of \nleftover tipulids (mg)"
+      "Total dry biomass of \nremaining tipulids (mg)"
   
   if(parameter == "leftover_chir_ind")
     ret <- 
-      "Dry body mass \nof leftover chironomids (mg)"
+      "Dry body mass \nof remaining chironomids (mg)"
   
   if(parameter == "leftover_culi_ind")
     ret <- 
-      "Dry body mass \nof leftover culicids (mg)"
+      "Dry body mass \nof remaining culicids (mg)"
   
   if(parameter == "leftover_scir_ind")
     ret <- 
-      "Dry body mass \nof leftover scirtids (mg)"
+      "Dry body mass \nof remaining scirtids (mg)"
   
   if(parameter == "leftover_tipu_ind")
     ret <- 
-      "Dry body mass \nof leftover tipulids (mg)"
+      "Dry body mass \nof remaining tipulids (mg)"
 
   # Return
   return(ret)

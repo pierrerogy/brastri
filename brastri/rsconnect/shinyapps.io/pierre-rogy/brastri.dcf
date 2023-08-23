@@ -5,9 +5,7 @@ account: pierre-rogy
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9367597
-bundleId: 7563199
+bundleId: 7575724
 url: https://pierre-rogy.shinyapps.io/brastri/
-when: 1691959738.08828
-lastSyncTime: 1691959738.08829
 asMultiple: FALSE
 asStatic: FALSE

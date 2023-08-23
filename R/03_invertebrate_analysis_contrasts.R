@@ -13,96 +13,50 @@ source(here::here("brastri",
 # install.packages("StanHeaders", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 # install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
 
-# Load data ---------------------------------------------------------------
-# Aquatic communities
-community <-
-  readr::read_csv(here::here("brastri", "data",
-                             "community_data.csv")) %>% 
-  ## Remove ci columns
-  dplyr::select(-contains("ci_"), -path,  -day,
-                -abundance) %>% 
-  ## Add new treatment
-  dplyr::mutate(site_pred = factor(ifelse(country == "trini",
-                                          "trini", ifelse(country == "bras" & predator == "present",
-                                                          "bras_present", "bras_absent")),
-                                   levels = c("bras_absent", "bras_present", "trini")))
-## Do contrasts
-contrasts(community$site_pred) <- 
-  matrix(c(-0.5, -0.5, 1,
-           -1, 1, 0),
-         nrow = 3,
-         dimnames = list(c("bras_absent", "bras_present", "trini"), 
-                         c("bras_present", "trini")))
 
-# Bromeliads
-bromeliads <-
-  readr::read_csv(here::here("brastri", "data",
-                             "bromeliad_data.csv")) %>% 
-  ## Keep experimental bromeliads only
-  dplyr::filter(stringr::str_detect(string = bromeliad_id, 
-                                    pattern = "E")) %>% 
-  ## Remove the columns not needed
-  dplyr::select(-contains(c("_g", "actual", "site", "mm"))) %>% 
-  ## Add new treatment
-  dplyr::mutate(site_pred = factor(ifelse(country == "trini",
-                                          "trini", ifelse(country == "bras" & predator == "present",
-                                                          "bras_present", "bras_absent")),
-                                   levels = c("bras_absent", "bras_present", "trini")))
-## Do contrasts
-contrasts(community$site_pred) <- 
-  matrix(c(-0.5, -0.5, 1,
-           -1, 1, 0),
-         nrow = 3,
-         dimnames = list(c("bras_absent", "bras_present", "trini"), 
-                         c("bras_present", "trini")))
+# Trying questions --------------------------------------------------------
+rg <- ref_grid(indemergencemodel_chiro)
+em <- pairs(emmeans(rg, c("resource", "site_pred")))
+summary(em, point.est = mean)
+plot(em)
+pairs(emmeans(rg))
+pairs(emmeans(rg, c("resource")))
 
-# Emergence data
-emergence <- 
-  readr::read_csv(here::here("brastri", "data",
-                             "emergence_data.csv")) %>% 
-  ## Rename one column for the time being
-  dplyr::rename(bromeliad = bromspecies,
-                biomass_mg = dry_mass_mg) %>% 
-  ## Make custom species name
-  get_specnames() %>% 
-  ## Back to original species name
-  dplyr::rename(bromspecies = bromeliad) %>% 
-  ## Get day number of emergence
-  dplyr::mutate(day = lubridate::yday(lubridate::dmy(day))) %>% 
-  ## Convert to nday to emergence by substracting day number of day of set up
-  dplyr::mutate(ndays = ifelse(country == "bras",
-                               day - 91, day -  280)) %>% 
-## Add new treatment
-dplyr::mutate(site_pred = factor(ifelse(country == "trini",
-                                        "trini", ifelse(country == "bras" & predator == "present",
-                                                        "bras_present", "bras_absent")),
-                                 levels = c("bras_absent", "bras_present", "trini")))
-## Do contrasts
-contrasts(community$site_pred) <- 
-  matrix(c(-0.5, -0.5, 1,
-           -1, 1, 0),
-         nrow = 3,
-         dimnames = list(c("bras_absent", "bras_present", "trini"), 
-                         c("bras_present", "trini")))
 
-## Keep those species for which we had at least one body mass measurement
-emergence_selected <- 
-  emergence %>% 
-  dplyr::filter(species %in% (emergence %>% 
-                                dplyr::filter(!is.na(biomass_mg)) %>% 
-                                dplyr::select(species) %>% 
-                                dplyr::distinct() %>% 
-                                dplyr::pull())) %>% 
-  ## Now make length column numeric, add unknown to those without, and estimate biomass
-  dplyr::mutate(size_mm = ifelse(is.na(size_mm) | size_mm %in% c("busted", "missing", "escaped"),
-                                 "unknown", size_mm),
-                bwg_name = NA,
-                stage = "adult",
-                biomass_type = "dry") %>% 
-  ## Get biomass for missing values
-  hellometry::add_taxonomy() %>% 
-  hellometry::hello_metry()
 
+
+paired <- 
+  pairs(emmeans(rg, specs = ~ "resource:site_pred"))
+describe_posterior(paired, 
+                   rope_range = rope_range(indemergencemodel_chiro))
+
+
+
+
+
+plot(emmeans(indemergencemodel_chiro, 
+        specs = ~ site_pred))
+describe_posterior(em)
+emmeans_test(em)
+posteriors <- 
+  get_parameters(indemergencemodel_culi) %>% 
+  tidyr::pivot_longer(cols = everything()) %>% 
+  dplyr::filter(name != "sigma")
+  
+ggplot(posteriors, aes(y = value,
+                       x = name)) +
+  geom_violin() 
+conditional_effects(indemergencemodel_chiro, surface = T)
+hypotheses <- 
+  c("-resourceenriched = 0", # effect of resource in bras absent
+    "(Intercept + resourceenriched:site_predbras_present) - (Intercept + site_predbras_present) = 0", # effect of resource in bras present
+    "(Intercept + resourceenriched:site_predtrini) - (Intercept + site_predtrini) = 0", # effect of resouce in simla
+    "site_predbras_present = 0", # effect of predators when not enriched
+    "(Intercept + resourceenriched:site_predbras_present) - (Intercept + resourceenriched) = 0" # effects of predators when enriched
+    ) 
+brms::hypothesis(indemergencemodel_chiro,
+                 hypotheses)
+bayesfactor(indemergencemodel_chiro)
 # Models on total emerged biomass -----------------------------------------------
 # Overall biomass
 ## Fit model
@@ -345,7 +299,7 @@ readr::write_csv(table_4,
 ## Fit model
 indemergencemodel_chiro <-
   brms::brm(biomass_mg~
-              resource*site_pred + (1|bromeliad_id/bromspecies/country),
+              resource + site_pred + (1|bromeliad_id/bromspecies/country),
             iter = 2000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.9,
@@ -475,7 +429,7 @@ table_5 <-
                     "<strong>0.85 (-0.13, 1.89) <br>pd = 95.78% <br>% in ROPE = 1.37</strong>", # tipu
                     "<strong>0.04 (0.02, 0.06) <br>pd = 100% <br>% in ROPE = 0</strong>" # cera
     ),
-    `Resource Enriched` = c("'0.002 (-0.04, 0.03) <br>pd = 55.33% <br>% in ROPE = 19.53", # chiro
+    `Resource Enriched` = c("0.002 (-0.04, 0.03) <br>pd = 55.33% <br>% in ROPE = 19.53", # chiro
                             "-0.08 (-0.21, 0.05) <br>pd = 89.95% <br>% in ROPE = 7.45", # culi
                             "-0.57 (-1.72, 0.61) <br>pd = 84.82% <br>% in ROPE = 3.26", # tipu
                             "0.02 (-0.01, 0.05) <br>pd = 94.03% <br>% in ROPE = 4.32" # cera
@@ -709,7 +663,7 @@ readr::write_csv(table_6,
 ## Fit model
 propemergencemodel_seed <-
   brms::brm(prop ~
-              resource*site_pred + (1|bromspecies/country),
+              site_pred*resource + (1|bromspecies/country),
             iter = 2000,
             family = zero_inflated_beta(),    
             control = list(adapt_delta = 0.99,
@@ -717,10 +671,12 @@ propemergencemodel_seed <-
             data = summarise_proportion(dats = emergence_selected,
                                        bromeliads = bromeliads,
                                        group = "seed"))
+
+
 ## Check assumptions
 plot(propemergencemodel_seed)
 ## Check effects
-bayestestR::describe_posterior(propemergencemodel_seed)
+bayestestR::describe_posterior(propemergencemodel_seed1)
 ## Plot
 figs4a <- 
   treatment_plot(model = propemergencemodel_seed, 
@@ -1252,7 +1208,7 @@ readr::write_csv(table_9,
 
 
 # Compiling figures -------------------------------------------------------
-# Figure 2, sig emerged biomass and proportion emerging
+# Figure 2, sig remaining
 ## Make figure
 fig3 <- 
   cowplot::plot_grid(fig3a +
@@ -1285,7 +1241,7 @@ ggsave(here::here("brastri", "www",
        bg = "white")
 
 
-# Figure s2, unsig emerged biomass
+# Figure s2, unsig remaining biomass
 ## Make figure
 figs2 <- 
   cowplot::plot_grid(figs2a +
@@ -1320,7 +1276,7 @@ ggsave(here::here("brastri", "www",
        bg = "white")
 
 
-# Figure 3, sig leftover and P content
+# Figure 3, sig re and P content
 # Generate figure
 ## Get legend
 legend <- 
