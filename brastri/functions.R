@@ -2,6 +2,8 @@
 
 # Libraries
 library(tidyverse)
+library(emmeans)
+library(bayestestR)
 
 # Select data -------------------------------------------------------------
 get_those_dats <- function(y = "none", x = "none", 
@@ -94,10 +96,17 @@ get_those_dats <- function(y = "none", x = "none",
   }
   
   # Fine bag decomposition - dry
-  if(y == "fine_dry"){
+  if(stringr::str_detect(string = y, pattern = "fine_dry")){
     ret <-
       water %>%
       dplyr::mutate(y = prop_loss_fine_dry)
+  }
+  
+  # Invert decomposition - dry
+  if(y == "invert_dry"){
+    ret <-
+      water %>%
+      dplyr::mutate(y = prop_loss_invert_dry)
   }
   
   # Coarse bag decomposition - wet
@@ -192,6 +201,16 @@ get_those_dats <- function(y = "none", x = "none",
       dplyr::rename(y = biomass_mg)
   }
   
+  # Number of individuals emerged 
+  if(stringr::str_detect(string = y, pattern = "nadult")){
+  ret <- 
+    emergence %>% 
+    dplyr::rename(y = n)}
+  
+  if(stringr::str_detect(string = y, pattern = "remaining")){
+    ret <- 
+      communities %>% 
+      dplyr::rename(y = n)}
   
   # Return data
   return(ret)
@@ -244,19 +263,28 @@ axis_label <- function(parameter){
   
   if(parameter == "coarse_dry")
     ret <- 
-      "Mass loss proportion in coarse mesh bag (wet-dry)"
+      "Mass loss proportion in coarse mesh bags"
   
-  if(parameter == "fine_dry")
+  if(parameter == "fine_dry_BR")
     ret <- 
-      "Mass loss proportion in fine mesh bag (wet-dry)"
+      "Mass loss proportion in \nRegua fine mesh bags"
+  
+  if(parameter == "fine_dry_TT")
+    ret <- 
+      "Mass loss proportion in \nSimla fine mesh bags"
+  
+  # Invert decomposition - dry
+  if(parameter == "invert_dry")
+    ret <- 
+      "Poportion of mass loss \ntoinvertebrate decomposition"
   
   if(parameter == "coarse_normal")
     ret <- 
-      "Mass loss proportion in coarse mesh bag (wet-wet)"
+      "Mass loss proportion in coarse mesh bags (wet-wet)"
   
   if(parameter == "fine_normal")
     ret <- 
-      "Mass loss proportion in fine mesh bag (wet-wet)"
+      "Mass loss proportion in fine mesh bags (wet-wet)"
   
   if(parameter == "emergence_all")
     ret <- 
@@ -365,6 +393,35 @@ axis_label <- function(parameter){
   if(parameter == "leftover_tipu_ind")
     ret <- 
       "Dry body mass \nof remaining tipulids (mg)"
+  
+  if(parameter == "nadult_chiro")
+    ret <- 
+      "Number of adult \nchironomids in trap"
+  
+  if(parameter == "nadult_cera")
+    ret <- 
+      "Number of adult \nceratopogonids in trap"
+  
+  if(parameter == "nadult_culi")
+    ret <- 
+      "Number of adult \nculicids in trap"
+  
+  if(parameter == "nadult_tipu")
+    ret <- 
+      "Number of adult \ntipulids in trap"
+  
+  if(parameter == "nremaining_culi")
+    ret <- 
+      "Number of culicid \nlarvae remaining"
+  
+  if(parameter == "nremaining_tipu")
+    ret <- 
+      "Number of tipulid \nlarvae remaining"
+  
+  if(parameter == "nremaining_scirtid")
+    ret <- 
+      "Number of scirtid \nlarvae remaining"
+  
 
   # Return
   return(ret)
@@ -921,3 +978,83 @@ summarise_leftover <- function(dats, bromeliads, group){
   
   
 }
+
+
+# Get pairwise contrasts --------------------------------------------------
+pairwise_contrasts <- function(model, both = FALSE, bras = FALSE, trini = FALSE, ROPE = FALSE){
+  # List of specs
+  if(both == TRUE){
+    # Model 
+    specs <- 
+      c("resource", "site_pred")
+    # Contrasts
+    contrasts <- 
+      c(
+        # Site contrasts
+        "control bras_absent - control trini",
+        "enriched bras_absent - enriched trini",
+        "control bras_present - control trini",
+        "enriched bras_present - enriched trini",  
+        # Resource contrasts
+        "control bras_absent - enriched bras_absent",
+        "control bras_present - enriched bras_present",
+        "control trini - enriched trini",
+        # Predator contrasts
+        "control bras_absent - control bras_present",
+        "enriched bras_absent - enriched bras_present"
+        )} 
+  if(bras == TRUE){
+    # Model
+    specs <- 
+      c("resource", "predator")
+    # Contrasts
+    contrasts <- 
+      c(# Resource contrasts
+        "control absent - enriched absent",
+        "control present - enriched present",
+        # Predator contrasts
+        "control absent - control present",
+        "enriched absent - enriched present")
+    }
+  if(trini == TRUE){
+    # Model
+    specs <- 
+      "resource"
+    # Contrasts
+    contrasts <- 
+      "control - enriched"}
+  
+  # Get contrasts
+  ret <- 
+    ## Create reference grid to be worked on by emmeans
+    emmeans::ref_grid(model) %>% 
+    ## Get means based on model-specific parameters
+    emmeans::emmeans(specs) %>% 
+    ## Get pairwise differences
+    emmeans:::pairs.emmGrid()
+  
+  # Get rope
+  if(!ROPE){
+    rope = bayestestR::rope_range(model)} else{
+      rope = c(-ROPE, ROPE)}
+  
+  # Get posterior distributions of differences
+  ret <- 
+    ret %>% 
+    bayestestR::describe_posterior(rope_range = rope) %>% 
+    ## Convert to tibble because a bit nicer
+    tibble::as_tibble() %>% 
+    # Filter contrasts depending on model
+    dplyr::filter(Parameter %in% contrasts) %>% 
+    # Arrange these contrasts to make it easier to read the tables
+    dplyr::arrange(factor(Parameter, 
+                          levels = contrasts)) %>% 
+    ## Remove these two columns with interval size
+    dplyr::select(-CI, -ROPE_CI) %>% 
+    ## Round these ginormous floats
+    dplyr::mutate(dplyr::across(dplyr::where(is.numeric), \(x)
+                                round(x, digits = 3)))
+  
+  # Return
+  return(ret)}
+

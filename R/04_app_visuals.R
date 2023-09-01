@@ -263,7 +263,7 @@ ggsave(here::here("brastri", "www",
 table3 <- 
   tibble::tibble(species = rep(x = c("Scirtes_sp1", "Tipulidae", 
                                      "Diptera_Tanypodinae", "Polypedilum", 
-                                     "Culicidae_Wyeomyia", "Odonata_Coenagrionidae"), 
+                                     "Culicidae_Wyeomyia", "Coenagrionidae"), 
                                times = 2),
                  org = rep(x = c("<i>Scirtes</i>", "Tipulidae",
                                  "Tanypodinae", "<i>Polypedilum</i>", 
@@ -319,7 +319,7 @@ temp1 <-
   dplyr::mutate(species = ifelse(species == "Hexapoda_Odonata",
                                  "Hexapoda_Odonata", ifelse(species == "Chironomidae",
                                                                   "Polypedilum" , ifelse(species == "Culicidae",
-                                                                                                      "Culicidae_Wyeomyia" , "Tipulidae"))))
+                                                                                                      "Culicidae_Wyeomyia" , species))))
 
 # Add how many were found at the end
 temp2 <- 

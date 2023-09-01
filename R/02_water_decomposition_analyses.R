@@ -4,6 +4,7 @@
 library(tidyverse)
 library(here)
 library(brms)
+library(emmeans)
 library(bayestestR)
 source(here::here("brastri",
                   "functions.R"))
@@ -77,7 +78,9 @@ tempmodel <-
 ## Check assumptions
 plot(tempmodel)
 ## Check effects
-bayestestR::describe_posterior(tempmodel)
+t1 <- 
+  pairwise_contrasts(tempmodel, 
+                   both = T)
 ## Plot
 figs1a <- 
   treatment_plot(model = tempmodel, 
@@ -101,7 +104,9 @@ pHmodel <-
 ## Check assumptions
 plot(pHmodel)
 ## Check effects
-bayestestR::describe_posterior(pHmodel)
+t2 <- 
+  pairwise_contrasts(pHmodel, 
+                     both = T)
 ## Plot
 figs1b <- 
   treatment_plot(model = pHmodel, 
@@ -125,7 +130,9 @@ condmodel <-
 ## Check assumptions
 plot(condmodel)
 ## Check effects
-bayestestR::describe_posterior(condmodel)
+t3 <- 
+  pairwise_contrasts(condmodel, 
+                     bras = T)
 ## Plot
 figs1c <- 
   treatment_plot(model = condmodel, 
@@ -149,7 +156,9 @@ tpmodel <-
 ## Check assumptions
 plot(tpmodel)
 ## Check effects
-bayestestR::describe_posterior(tpmodel)
+t4 <- 
+  pairwise_contrasts(tpmodel, 
+                     bras = T)
 ## Plot
 fig2a <- 
   treatment_plot(model = tpmodel, 
@@ -173,7 +182,9 @@ pppmmodel <-
 ## Check assumptions
 plot(pppmmodel)
 ## Check effects
-bayestestR::describe_posterior(pppmmodel)
+t5 <- 
+  pairwise_contrasts(pppmmodel, 
+                     trini = T)
 ## Plot
 fig2b <- 
   treatment_plot(model = pppmmodel, 
@@ -199,9 +210,11 @@ chloromodel <-
 ## Check assumptions
 plot(chloromodel)
 ## Check effects
-bayestestR::describe_posterior(chloromodel)
+t6 <- 
+  pairwise_contrasts(chloromodel, 
+                     bras = T)
 ## Plot
-figs1d <- 
+fig2c <- 
   treatment_plot(model = chloromodel, 
                  parameter = "Chlorophyll-a", 
                  scale = "log", 
@@ -211,140 +224,195 @@ figs1d <-
                  emergence = emergence)
 
 # Generate table with outputs
-## Make table
 table_1 <- 
-  data.frame(
-    ` ` = c("<strong>Temperature <br>ROPE = (-0.01, 0.01)</strong>", # temperature
-           "<strong>pH <br>ROPE = (-0.01, 0.01)</strong>", # pH
-           "<strong>Conductivity <br>ROPE = (-2.52, 2.52)</strong>", # cond
-           "<strong>Total P <br>ROPE = (-0.01, 0.01)</strong>", # TP
-           "<strong>Phosphate <br>ROPE = (-0.1, 0.1)</strong>", # PPPM
-           "<strong>Chlorophyll-a <br>ROPE = (-0.01, 0.01)</strong>" # Chloro
-    ),
-    `Intercept` = c("<strong>3.22 (3.17, 3.28) <br>pd = 100% <br>% in ROPE = 0</strong>", # temperature
-                  "<strong>1.78 (1.76, 1.81) <br>pd = 100% <br>% in ROPE = 0</strong>", # pH
-                  "<strong>4.49 (3.10, 5.85) <br>pd = 100% <br>% in ROPE = 0</strong>", # cond
-                  "<strong>4.69  (4.14,  5.08) <br>pd = 100% <br>% in ROPE = 0</strong>", # TP
-                  "<strong> -3.52 (-5.48, -1.49) <br>pd = 99.88% <br>% in ROPE = 0.18</strong>", # PPPM
-                  "<strong>-6.18 (-7.29, -5.12]) <br>pd = 100% <br>% in ROPE = 0</strong>" # Chloro
-    ),
-    `Resource Enriched` = c("0.002 (-0.01, 0.01) <br>pd = 64.92% <br>% in ROPE = 96.03", # temperature
-                           "-0.02 (-0.03, 0.04) <br>pd = 94.78% <br>% in ROPE = 16.75", # pH
-                           "1.81 (0.95, 2.70) <br>pd = 100% <br>% in ROPE = 96.42", # cond
-                           "-0.31 (-0.75,  0.13) <br>pd = 91.00% <br>% in ROPE = 1.66", # TP
-                           "<strong>1.82 (0.42,  3.28) <br>pd = 99.48% <br>% in ROPE = 0</strong>", # PPPM
-                           "-0.20 (-1.16,  0.74) <br>pd = 66.17% <br>% in ROPE = 1.47" # Chloro
-    ),
-    `Present Regua` = c("-0.002 (-0.01, 0.01) <br>pd = 62.68% <br>% in ROPE = 98.11", # temperature
-                        "-0.002 (-0.03, 0.02) <br>pd = 58.14% <br>% in ROPE = 58.77", # pH
-                        "-0.31 (-1.27, 0.43) <br>pd = 83.83% <br>% in ROPE = 100",# cond
-                        "<strong>-0.47 (-0.92, -0.04) <br>pd = 98.05% <br>% in ROPE = 0</strong>",# TP
-                        "", # PPPM
-                        "0.20 (-0.75,  1.16]) <br>pd = 66.88% <br>% in ROPE = 1.53" # Chloro
-    ),
-    `Simla` = c("0.02 (-0.05, 0.11) <br>pd = 78.38% <br>% in ROPE = 17.39", # temperature
-                "0.001 (-0.02, 0.01) <br>pd = 54.28% <br>% in ROPE = 50.09", # pH
-                "", # cond
-                "", # TP
-                "", # PPPM
-                "" # Chloro
-    ),
-    `Present ReguaxResource Enriched` = c("0.003 (-0.02, 0.03) <br>pd = 60.45% <br>% in ROPE = 87.71", # temperature
-                                           "0.003 (-0.03, 0.04) <br>pd = 56.74% <br>% in ROPE = 44.39", # pH
-                                           "-0.37 (-1.58, 0.82) <br>pd = 72.62% <br>% in ROPE = 100",# cond
-                                           "0.05 (-0.65,  0.75) <br>pd = 55.97% <br>% in ROPE = 3",# TP
-                                           "", # PPPM
-                                           "1.06 (-0.34,  2.43) <br>pd = 93.38%% <br>% in ROPE = 0.32" # Chloro
-    ),
-    `SimlaxResource Enriched` = c("<0.001 (-0.01, 0.01) <br>pd = 50.05% <br>% in ROPE = 88.89", # temperature
-                                  "-0.008 (-0.04, 0.03) <br>pd = 68.47% <br>% in ROPE = 41.23", # pH
-                                  "",# cond
-                                  "",# TP
-                                  "", # PPPM
-                                  "" # Chloro
-    )
-  )
+  t1 %>% 
+  dplyr::bind_rows(list(t2,
+                        t3,
+                        t4,
+                        t5,
+                        t6))
 ## Save table
 readr::write_csv(table_1,
                  here::here("brastri", "data",
                             "table_1.csv"))
 
 # Treatments on decomposition  ---------------------------------
-# Decomposition coarse dry
+# Decomposition coarse dry BR
 ## Fit model
-coarsemodeldry <-
-  brms::brm(log(prop_loss_coarse_dry)  ~
-              resource*site_pred,
+coarsemodeldry_BR <-
+  brms::brm(prop_loss_coarse_dry  ~
+              resource*predator,
             iter = 2000,
-            family = gaussian(link = "identity"),      
-            control = list(adapt_delta = 0.85,
-                           max_treedepth = 10),
-            data = water)
+            family = gaussian(),      
+            control = list(adapt_delta = 0.95,
+                           max_treedepth = 15),
+            data = water %>% 
+              dplyr::select(prop_loss_coarse_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+              dplyr::distinct() %>% 
+              dplyr::filter(country == "bras"))
 ## Check assumptions
-plot(coarsemodeldry)
+plot(coarsemodeldry_BR)
 ## Check effects
-bayestestR::describe_posterior(coarsemodeldry)
+pairwise_contrasts(coarsemodeldry_BR, 
+                   bras = T)
 ## Plot
-fig2c <- 
-  treatment_plot(model = coarsemodeldry, 
-                 parameter = "coarse_dry",  
-                 scale = "log",
-                 bromeliads = bromeliads, 
-                 communities = communities, 
-                 water = water, 
-                 emergence = emergence)
+treatment_plot(model = coarsemodeldry_BR, 
+               parameter = "coarse_dry",  
+               scale = "none",
+               bromeliads = bromeliads, 
+               communities = communities, 
+               water = water %>% 
+                 dplyr::filter(country == "bras"), 
+               emergence = emergence)
+
+# Decomposition coarse dry TT
+## Fit model
+coarsemodeldry_TT <-
+  brms::brm(prop_loss_coarse_dry  ~
+              resource + (1|bromspecies),
+            iter = 10000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
+            data = water %>% 
+              dplyr::select(prop_loss_coarse_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+              dplyr::distinct() %>% 
+              dplyr::filter(country == "trini"))
+## Check assumptions
+plot(coarsemodeldry_TT)
+## Check effects
+pairwise_contrasts(coarsemodeldry_TT, 
+                   trini = T)
+## Plot
+treatment_plot(model = coarsemodeldry_TT, 
+               parameter = "coarse_dry",  
+               scale = "none",
+               bromeliads = bromeliads, 
+               communities = communities, 
+               water = water %>% 
+                 dplyr::select(prop_loss_coarse_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+                 dplyr::distinct() %>% 
+                 dplyr::filter(country == "trini"), 
+               emergence = emergence,
+               trini = T)
 
 # Decomposition fine dry BR
 ## Fit model
-finemodeldry <-
-  brms::brm(log(prop_loss_fine_dry)  ~
-              resource*site_pred,
+finemodeldry_BR <-
+  brms::brm(prop_loss_fine_dry  ~
+              resource*predator,
             iter = 2000,
             family = gaussian(link = "identity"),        
-            control = list(adapt_delta = 0.85,
-                           max_treedepth = 10),
-            data = water)
+            control = list(adapt_delta = 0.95,
+                           max_treedepth = 15),
+            data = water %>% 
+              dplyr::select(prop_loss_fine_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+              dplyr::distinct() %>% 
+              dplyr::filter(country == "bras"))
 ## Check assumptions
-plot(finemodeldry)
+plot(finemodeldry_BR)
 ## Check effects
-bayestestR::describe_posterior(finemodeldry)
+t7a <- 
+  pairwise_contrasts(finemodeldry_BR, 
+                     bras = T)
 ## Plot
-fig2d <- 
-  treatment_plot(model = finemodeldry, 
-                 parameter = "fine_dry",  
-                 scale = "log",
+figs1d <- 
+  treatment_plot(model = finemodeldry_BR, 
+                 parameter = "fine_dry_BR",  
+                 scale = "none",
                  bromeliads = bromeliads, 
                  communities = communities, 
-                 water = water, 
+                 water = water %>% 
+                   dplyr::select(prop_loss_fine_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+                   dplyr::distinct() %>% 
+                   dplyr::filter(country == "bras"), 
                  emergence = emergence)
 
+# Decomposition fine dry TT
+## Fit model
+finemodeldry_TT <-
+  brms::brm(prop_loss_fine_dry  ~
+              resource + (1|bromspecies),
+            iter = 10000,
+            family = gaussian(link = "identity"),        
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
+            data = water %>% 
+              dplyr::select(prop_loss_fine_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+              dplyr::distinct() %>% 
+              dplyr::filter(country == "trini"))
+## Check assumptions
+plot(finemodeldry_TT)
+## Check effects
+t7b <- 
+  pairwise_contrasts(finemodeldry_TT, 
+                     trini = T)
+## Plot
+fig2d <- 
+  treatment_plot(model = finemodeldry_TT, 
+                 parameter = "fine_dry_TT",  
+                 scale = "none",
+                 bromeliads = bromeliads, 
+                 communities = communities, 
+                 water = water %>% 
+                   dplyr::select(prop_loss_fine_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+                   dplyr::distinct() %>% 
+                   dplyr::filter(country == "trini"), 
+                 emergence = emergence,
+                 trini = T)
+
+
+# Decomposition inverts dry BR
+## Fit model
+invertmodeldry_BR <-
+  brms::brm(prop_loss_invert_dry  ~
+              resource*predator,
+            iter = 2000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.95,
+                           max_treedepth = 15),
+            data = water %>% 
+              dplyr::mutate(prop_loss_invert_dry = ifelse(prop_loss_coarse_dry - prop_loss_fine_dry > 0,
+                                                          prop_loss_coarse_dry - prop_loss_fine_dry, NA)) %>% 
+              dplyr::select(prop_loss_invert_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+              dplyr::distinct() %>% 
+              dplyr::filter(country == "bras"))
+## Check assumptions
+plot(invertmodeldry_BR)
+## Check effects
+t8a <- 
+  pairwise_contrasts(invertmodeldry_BR, 
+                     bras = T)
+## Plot
+fig2e <- 
+  treatment_plot(model = invertmodeldry_BR, 
+                 parameter = "invert_dry",  
+                 scale = "none",
+                 bromeliads = bromeliads, 
+                 communities = communities, 
+                 water = water %>% 
+                   dplyr::mutate(prop_loss_invert_dry = ifelse(prop_loss_coarse_dry - prop_loss_fine_dry > 0,
+                                                               prop_loss_coarse_dry - prop_loss_fine_dry, NA)) %>% 
+                   dplyr::select(prop_loss_invert_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+                   dplyr::distinct() %>% 
+                   dplyr::filter(country == "bras"), 
+                 emergence = emergence)
+
+# Decomposition inverts dry TT
+## Only three non-NA values
+water %>% 
+  dplyr::mutate(prop_loss_invert_dry = ifelse(prop_loss_coarse_dry - prop_loss_fine_dry > 0,
+                                              prop_loss_coarse_dry - prop_loss_fine_dry, NA)) %>% 
+  dplyr::select(prop_loss_invert_dry, resource, predator, bromspecies, country, bromeliad_id) %>% 
+  dplyr::distinct() %>% 
+  dplyr::filter(country == "trini")
+
 # Generate table with outputs
-## Make table
 table_2 <- 
-  data.frame(
-    ` ` = c("<strong>Coarse mesh decomposition<br>ROPE = (-0.01, 0.01)</strong>", # Coarse
-            "<strong>Fine mesh decomposition<br>ROPE = (-0.01, 0.01)</strong>" # Fine
-            ),
-    `Intercept` = c("<strong>-0.26 (-0.26, -0.26) <br>pd = 100% <br>% in ROPE = 0.</strong>", # Coarse
-                    "<strong>-0.26 (-0.27, -0.26) <br>pd = 100% <br>% in ROPE = 0.</strong>" # Fine
-    ),
-    `Resource Enriched` = c("-0.008 (-0.02, -0.004) <br>pd = 100% <br>% in ROPE = 80.67", # Coarse
-                            "-0.01 (-0.02, -0.01) <br>pd = 100% <br>% in ROPE = 32.26" # Fine
-                            ),
-    `Present Regua` = c("<strong>0.11 (0.11,  0.12) <br>pd = 100% <br>% in ROPE = 0</strong>",# Coarse
-                        "<strong>0.13 (0.13,  0.14) <br>pd = 100% <br>% in ROPE = 0</strong>" # Fine
-    ),
-    `Simla` = c("-0.003 (-0.01,  0.001) <br>pd = 100% <br>% in ROPE = 100", # Coarse
-                "-0.001 (-0.006,  0.003) <br>pd = 92.88% <br>% in ROPE = 100" # Fine
-    ),
-    `Present ReguaxResource Enriched` = c("0.006 (0.002, 0.01) <br>pd = 92.88% <br>% in ROPE = 94.18", # Coarse
-                                          "0.002 (0.002, 0.02) <br>pd = 65.05% <br>% in ROPE = 100" # Fine
-    ),
-    `SimlaxResource Enriched` = c("0.008 (0.003, 0.01) <br>pd = 99.92% <br>% in ROPE = 71.84", # Coarse
-                                  "0.007 (0.003, 0.01) <br>pd = 98.02% <br>% in ROPE = 79.92" # Fine
-    )
-  )
-## Save table
+  t7a %>% 
+  dplyr::bind_rows(list(t7b,
+                        t8a))
+# Save table
 readr::write_csv(table_2,
                  here::here("brastri", "data",
                             "table_2.csv"))
@@ -354,6 +422,9 @@ readr::write_csv(table_2,
 
 # Combine figures ---------------------------------------------------------
 # Figure 2 - sig associations
+## Get legend
+legend <- 
+  cowplot::get_legend(fig2a)
 ## Generate figure
 fig2 <- 
   cowplot::plot_grid(fig2a +
@@ -368,15 +439,11 @@ fig2 <-
                      fig2d +
                        theme(legend.position = "none") +
                        ggtitle("d"),
+                     fig2e +
+                       theme(legend.position = "none") +
+                       ggtitle("e"),
+                     legend,
                      ncol = 2)
-## Combine with legend
-legend <- 
-  cowplot::get_legend(fig2a)
-fig2 <- 
-  cowplot::plot_grid(legend,
-                     fig2,
-                     nrow = 2,
-                     rel_heights = c(0.1, 0.9))
 ## Save figure
 ggsave(here::here("brastri", "www",
                   "fig2.jpg"),
