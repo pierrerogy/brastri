@@ -330,7 +330,7 @@ t15 <-
   pairwise_contrasts(indemergencemodel_chiro, 
                    both = T)
 ## Plot
-fig3b <- 
+figs2f <- 
   treatment_plot(model = indemergencemodel_chiro, 
                  scale = "none",
                  parameter = "emergence_chir_ind", 
@@ -362,7 +362,7 @@ t16 <-
   pairwise_contrasts(indemergencemodel_culi, 
                      bras = T)
 ## Plot
-figs2f <- 
+figs2g <- 
   treatment_plot(model = indemergencemodel_culi, 
                  scale = "none",
                  parameter = "emergence_culi_ind", 
@@ -394,7 +394,7 @@ t17 <-
   pairwise_contrasts(indemergencemodel_tipu, 
                      both = T)
 ## Plot
-figs2g <- 
+figs2h <- 
   treatment_plot(model = indemergencemodel_tipu, 
                  scale = "none",
                  parameter = "emergence_tipu_ind", 
@@ -426,7 +426,7 @@ t18 <-
   pairwise_contrasts(indemergencemodel_cera, 
                      bras = T)
 ## Plot
-fig3c <- 
+fig3b <- 
   treatment_plot(model = indemergencemodel_cera, 
                  scale = "none",
                  parameter = "emergence_cera_ind", 
@@ -1270,17 +1270,14 @@ fig3 <-
                      fig3b +
                        theme(legend.position = "none") +
                        ggtitle("b"),
-                     fig3c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
                      legend,
-                     ncol = 2)
+                     ncol = 3)
 ## Save figure
 ggsave(here::here("brastri", "www",
                   "fig3.jpg"),
        fig3,
-       width = 10,
-       height = 10,
+       width = 9,
+       height = 4,
        bg = "white")
 
 
@@ -1308,6 +1305,9 @@ figs2 <-
                      figs2g +
                        theme(legend.position = "none") +
                        ggtitle("g"),
+                     figs2h +
+                       theme(legend.position = "none") +
+                       ggtitle("h"),
                      legend,
                      ncol = 2)
 ## Save figure
@@ -1315,7 +1315,7 @@ ggsave(here::here("brastri", "www",
                   "figs2.jpg"),
        figs2,
        width = 7,
-       height = 11,
+       height = 12,
        bg = "white")
 
 
