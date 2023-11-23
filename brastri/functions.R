@@ -207,10 +207,18 @@ get_those_dats <- function(y = "none", x = "none",
     emergence %>% 
     dplyr::rename(y = n)}
   
+  # Number of individuals remaining
   if(stringr::str_detect(string = y, pattern = "remaining")){
     ret <- 
       communities %>% 
       dplyr::rename(y = n)}
+  
+  # P content
+  if(stringr::str_detect(string = y, pattern = "p_prcnt")){
+    ret <-
+      communities %>%
+      dplyr::mutate(y = p_prcnt)
+  }
   
   # Return data
   return(ret)
@@ -276,7 +284,7 @@ axis_label <- function(parameter){
   # Invert decomposition - dry
   if(parameter == "invert_dry")
     ret <- 
-      "Poportion of mass loss \ntoinvertebrate decomposition"
+      "Poportion of mass loss \nto invertebrate decomposition"
   
   if(parameter == "coarse_normal")
     ret <- 
@@ -422,6 +430,34 @@ axis_label <- function(parameter){
     ret <- 
       "Number of scirtid \nlarvae remaining"
   
+  if(parameter == "p_prcnt_alladults")
+    ret <- 
+      "P content of emerged \nadults (%)"
+  
+  if(parameter == "p_prcnt_culiadults")
+    ret <- 
+      "P content of emerged \nculicid adults (%)"
+  
+  if(parameter == "p_prcnt_tipuadults")
+    ret <- 
+      "P content of emerged \ntipulid adults (%)"
+  
+  if(parameter == "p_prcnt_alllarvae")
+    ret <- 
+      "P content of remaining \nlarvae (%)"
+  
+  if(parameter == "p_prcnt_culilarvae")
+    ret <- 
+      "P content of remaining \nculicid larvae (%)"
+  
+  if(parameter == "p_prcnt_tipularvae")
+    ret <- 
+      "P content of remaining \ntipulid larvae (%)"
+  
+  if(parameter == "p_prcnt_scirlarvae")
+    ret <- 
+      "P content of remaining \nscirtid larvae (%)"
+
 
   # Return
   return(ret)
@@ -564,7 +600,9 @@ treatment_plot <- function(model, parameter, scale = "none", trini = F,
   if(!trini){
   model_effect <- 
     brms::conditional_effects(model,
-                              method = "fitted")[3] %>% 
+                              method = "fitted")
+  model_effect <- 
+    model_effect[length(model_effect)] %>% 
     purrr::flatten_df() %>% 
     dplyr::rename(x2 = contains("pred"))} else 
     {model_effect <- 
@@ -616,6 +654,10 @@ treatment_plot <- function(model, parameter, scale = "none", trini = F,
           dats %>% 
           dplyr::rename(x2 = predator) %>% 
           dplyr::filter(country == "bras")
+        if(parameter == "Chlorophyll-a" & scale == "none") 
+          dats <- 
+            dats %>% 
+            dplyr::mutate(y = log(y + 0.0001))
       }} else 
         if(trini)
           {namevec <- 
@@ -981,7 +1023,7 @@ summarise_leftover <- function(dats, bromeliads, group){
 
 
 # Get pairwise contrasts --------------------------------------------------
-pairwise_contrasts <- function(model, both = FALSE, bras = FALSE, trini = FALSE, ROPE = FALSE){
+pairwise_contrasts <- function(model, both = FALSE, bras = FALSE, trini = FALSE, ROPE = FALSE, invert_mass_mg = FALSE){
   # List of specs
   if(both == TRUE){
     # Model 
@@ -1054,6 +1096,21 @@ pairwise_contrasts <- function(model, both = FALSE, bras = FALSE, trini = FALSE,
     ## Round these ginormous floats
     dplyr::mutate(dplyr::across(dplyr::where(is.numeric), \(x)
                                 round(x, digits = 3)))
+  
+  # If we have invert mass
+  if(invert_mass_mg){
+    ret <- 
+      ret %>%
+      dplyr::bind_rows(bayestestR::describe_posterior(model) %>% 
+                         tibble::as_tibble() %>% 
+                         dplyr::filter(Parameter == ("b_loginvert_mass_mg")) %>% 
+                         dplyr::select(-CI, -ROPE_CI, -Rhat, -ESS))
+    
+  }
+  
+  
+  
+  
   
   # Return
   return(ret)}

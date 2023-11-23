@@ -420,3 +420,49 @@ readr::write_csv(emergence_data,
                  here::here("brastri", "data",
                             "emergence_data.csv"))
 
+
+
+# Phosphorus content ------------------------------------------------------
+# Read data
+## I put in in the brasil folder but it is for both sites
+temp1 <- 
+  readr::read_csv(here::here("brasil",
+                             "pcontent.csv")) %>% 
+  ## Remove the one mosquito with blood
+  dplyr::filter(tin_ID != "E3_adult_CULI_with_blood") %>% 
+  ## Make that both clearer
+  dplyr::mutate(taxon = ifelse(taxon == "both",
+                               "CulicidaeTipulidae", taxon)) %>% 
+  ## Make one new column with taxon, old one will be species
+  ## NB: only tipulidae has more than one species
+  dplyr::rename(species = taxon) %>% 
+  dplyr::mutate(taxon = ifelse(stringr::str_detect(string = species,
+                                                   pattern = "Tipu"),
+                                                   "Tipulidae", species)) %>% 
+  dplyr::mutate(taxon = stringr::str_replace(string = taxon,
+                                             pattern = "_.*",
+                                             replacement = "")) %>% 
+  
+  ## Join treatments
+  ### First need to change brasil to bras
+  dplyr::mutate(country = ifelse(country == "brasil",
+                                 "bras", country)) %>% 
+  dplyr::left_join(bromeliad_data %>% 
+                     dplyr::select(country, bromeliad_id, bromspecies, predator, resource),
+                   by = c("country", "bromeliad_id")) %>% 
+  # Rename p_content and mass analysed
+  dplyr::rename(mass_measured = Nessel_invrt_mass,
+                p_prcnt = `P%`) %>% 
+  # Remove % in p_prcnt
+  dplyr::mutate(p_prcnt = stringr::str_remove(string = p_prcnt,
+                                              pattern = "%")) %>% 
+  ## Select columns of interest
+  dplyr::select(country, bromeliad_id, bromspecies, predator, 
+                resource, taxon, species, stage, n_indiv, invert_mass_mg,
+                mass_measured, p_prcnt)
+
+# Save data
+readr::write_csv(temp1,
+                 here::here("brastri", "data",
+                            "pcontent.csv"))
+

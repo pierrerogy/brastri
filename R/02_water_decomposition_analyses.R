@@ -217,7 +217,7 @@ t6 <-
 fig2c <- 
   treatment_plot(model = chloromodel, 
                  parameter = "Chlorophyll-a", 
-                 scale = "log", 
+                 scale = "none", 
                  bromeliads = bromeliads, 
                  communities = communities, 
                  water = water, 

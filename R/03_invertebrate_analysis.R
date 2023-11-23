@@ -105,13 +105,30 @@ emergence_selected <-
   hellometry::add_taxonomy() %>% 
   hellometry::hello_metry()
 
+# P content
+pcontent <-
+  readr::read_csv(here::here("brastri", "data",
+                             "pcontent.csv")) %>% 
+  ## Add new treatment
+  dplyr::mutate(site_pred = factor(ifelse(country == "trini",
+                                          "trini", ifelse(country == "bras" & predator == "present",
+                                                          "bras_present", "bras_absent")),
+                                   levels = c("bras_absent", "bras_present", "trini")))
+## Do contrasts
+contrasts(pcontent$site_pred) <- 
+  matrix(c(-0.5, -0.5, 1,
+           -1, 1, 0),
+         nrow = 3,
+         dimnames = list(c("bras_absent", "bras_present", "trini"), 
+                         c("bras_present", "trini")))
+
 # Models on total emerged biomass -----------------------------------------------
 # Overall biomass
 ## Fit model
 emergencemodel_all <-
   brms::brm(biomass_mg ~
               resource*site_pred + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -143,7 +160,7 @@ figs2a <-
 emergencemodel_seed <-
   brms::brm(biomass_mg ~
               resource*site_pred + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -175,7 +192,7 @@ figs2b <-
 emergencemodel_chiro <-
   brms::brm(biomass_mg ~
               resource*site_pred + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -205,7 +222,7 @@ fig3a <-
 emergencemodel_culi <-
   brms::brm(biomass_mg ~
               resource*predator,
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -237,7 +254,7 @@ figs2c <-
 emergencemodel_tipu <-
   brms::brm(biomass_mg~
               resource*site_pred + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -267,7 +284,7 @@ figs2d <-
 emergencemodel_cera <-
   brms::brm(biomass_mg ~
               resource*predator,
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -315,7 +332,7 @@ readr::write_csv(table_4,
 indemergencemodel_chiro <-
   brms::brm(biomass_mg~
               resource*site_pred + (1|bromeliad_id/bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.9,
                            max_treedepth = 10),
@@ -347,7 +364,7 @@ figs2f <-
 indemergencemodel_culi <-
   brms::brm(biomass_mg~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.9,
                            max_treedepth = 10),
@@ -379,7 +396,7 @@ figs2g <-
 indemergencemodel_tipu <-
   brms::brm(biomass_mg~
               resource*site_pred + (1|bromeliad_id/bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -411,7 +428,7 @@ figs2h <-
 indemergencemodel_cera <-
   brms::brm(biomass_mg~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.9,
                            max_treedepth = 10),
@@ -458,7 +475,7 @@ readr::write_csv(table_5,
 indgrowthmodel_culi <-
   brms::brm(ndays~
               resource*predator + (1|bromeliad_id/bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.9,
                            max_treedepth = 10),
@@ -529,7 +546,7 @@ figs3 <-
 ggsave(here::here("brastri", "www",
                   "figs3.jpg"),
        figs3,
-       width = 9,
+       width = 10,
        height = 4,
        bg = "white")
 
@@ -553,7 +570,7 @@ readr::write_csv(table_6,
 propemergencemodel_seed <-
   brms::brm(prop ~
               site_pred*resource + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = zero_inflated_beta(),    
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -594,7 +611,7 @@ dats <-
 nemergencemodel_culi <-
   brms::brm(n ~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -630,7 +647,7 @@ dats <-
 nemergencemodel_tipu <-
   brms::brm(n ~
               resource*site_pred + (1|bromeliad_id/bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -665,7 +682,7 @@ dats <-
 nemergencemodel_chiro <-
   brms::brm(n ~
               resource*site_pred + (1|bromeliad_id/bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -700,7 +717,7 @@ dats <-
 nemergencemodel_cera <-
   brms::brm(n ~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -789,7 +806,7 @@ community_end <-
 leftovermodel_all <-
   brms::brm(biomass_mg~
               resource*site_pred + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -819,7 +836,7 @@ figs5a <-
 leftovermodel_seed <-
   brms::brm(biomass_mg~
               resource*site_pred + (1|bromspecies/country),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -850,7 +867,7 @@ figs5b <-
 leftovermodel_chiro <-
   brms::brm(biomass_mg ~
               resource + (1|bromspecies),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -883,7 +900,7 @@ figs5c <-
 leftovermodel_culi <-
   brms::brm(biomass_mg~
               resource*predator,
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -914,7 +931,7 @@ figs5d <-
 leftovermodel_tipu <-
   brms::brm(biomass_mg ~
               resource*predator,
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -944,7 +961,7 @@ figs5e <-
 leftovermodel_scir <-
   brms::brm(biomass_mg~
               resource + (1|bromspecies),
-            iter = 2000,
+            iter = 5000,
             family = skew_normal(),      
             control = list(adapt_delta = 0.99,
                            max_treedepth = 15),
@@ -1015,7 +1032,7 @@ t30 <-
   pairwise_contrasts(indleftovermodel_culi, 
                      bras = T)
 ## Plot
-fig4a <- 
+fig3c <- 
   treatment_plot(model = indleftovermodel_culi, 
                  scale = "none",
                  parameter = "leftover_culi_ind", 
@@ -1033,7 +1050,7 @@ fig4a <-
 indleftovermodel_tipu <-
   brms::brm(log(biomass_mg) ~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.93,
                            max_treedepth = 10),
@@ -1065,7 +1082,7 @@ figs5g <-
 indleftovermodel_scir <-
   brms::brm(biomass_mg~
               resource + (1|bromeliad_id/bromspecies),
-            iter = 2000,
+            iter = 5000,
             family = gaussian(link = "identity"),      
             control = list(adapt_delta = 0.9,
                            max_treedepth = 10),
@@ -1080,7 +1097,7 @@ t32 <-
   pairwise_contrasts(indleftovermodel_scir, 
                      trini = T)
 ## Plot
-fig4b <- 
+fig3d <- 
   treatment_plot(model = indleftovermodel_scir, 
                  scale = "none",
                  parameter = "leftover_scir_ind", 
@@ -1128,7 +1145,7 @@ dats <-
 nleftovermodel_culi <-
   brms::brm(n ~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -1163,7 +1180,7 @@ dats <-
 nleftovermodel_tipu <-
   brms::brm(n ~
               resource*predator + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -1198,7 +1215,7 @@ dats <-
 nleftovermodel_scir <-
   brms::brm(n ~
               resource + (1|bromeliad_id),
-            iter = 2000,
+            iter = 5000,
             family = poisson(),      
             control = list(adapt_delta = 0.95,
                            max_treedepth = 10),
@@ -1232,33 +1249,226 @@ readr::write_csv(table_10,
                  here::here("brastri", "data",
                             "table_10.csv"))
 
-# Make figure
-figs6 <- 
-  cowplot::plot_grid(figs6a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
-                     figs6b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
-                     figs6c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
-                     legend,
-                     ncol = 2)
-## Save figure
-ggsave(here::here("brastri", "www",
-                  "figs6.jpg"),
-       figs6,
-       width = 9,
-       height = 9,
-       bg = "white")
+# Model on P content - adults ------------------------------------------------------
+# All adults  
+## Fit model
+pcontentmodel_alladults <-
+  brms::brm(log(p_prcnt) ~
+              resource*site_pred + (1|species/bromspecies/country),
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.98,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "adult"))
+## Check assumptions
+plot(pcontentmodel_alladults)
+## Check effects
+t40 <- 
+  pairwise_contrasts(pcontentmodel_alladults, 
+                     both = T)
+## Plot
+fig4a <- 
+  treatment_plot(model = pcontentmodel_alladults, 
+                 scale = "log",
+                 parameter = "p_prcnt_alladults", 
+                 bromeliads = bromeliads, 
+                 communities = pcontent %>% 
+                   dplyr::filter(stage == "adult"), 
+                 water = water, 
+                 emergence = emergence) +
+    scale_y_continuous(trans = "log",
+                       breaks = c(0.01, 0.3, 1, 5))
 
+# Mosquito adults  
+## Fit model
+pcontentmodel_culiadults <-
+  brms::brm(log(p_prcnt) ~
+              resource*predator,
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.98,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "adult" & taxon == "Culicidae" & country == "bras"))
+## Check assumptions
+plot(pcontentmodel_culiadults)
+## Check effects
+t41 <- 
+  pairwise_contrasts(pcontentmodel_culiadults, 
+                     bras = T)
+## Plot
+figs7a <- 
+  treatment_plot(model = pcontentmodel_culiadults, 
+                 scale = "log",
+                 parameter = "p_prcnt_culiadults", 
+                 bromeliads = bromeliads, 
+                 communities = pcontent %>% 
+                   dplyr::filter(stage == "adult" & taxon == "Culicidae" & country == "bras"), 
+                 water = water, 
+                 emergence = emergence) +
+    scale_y_continuous(trans = "log",
+                       breaks = c(0.05, 0.3, 1, 4))
 
+# Tipulid adults
+## Fit model
+pcontentmodel_tipuadults<-
+  brms::brm(log(p_prcnt) ~
+              resource*site_pred + (1|species/bromspecies/country),
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.98,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "adult" & taxon == "Tipulidae"))
+## Check assumptions
+plot(pcontentmodel_tipuadults)
+## Check effects
+t42 <- 
+  pairwise_contrasts(pcontentmodel_tipuadults, 
+                     both = T)
+## Plot
+fig4b <- 
+  treatment_plot(model = pcontentmodel_tipuadults, 
+                 scale = "log",
+                 parameter = "p_prcnt_tipuadults", 
+                 bromeliads = bromeliads, 
+                 communities = pcontent %>% 
+                   dplyr::filter(stage == "adult" & taxon == "Tipulidae"), 
+                 water = water, 
+                 emergence = emergence) +
+    scale_y_continuous(trans = "log",
+                       breaks = c(0.01, 0.05, 1, 20))
 
+# Model on P content - larvae ------------------------------------------------------
+# All larvae  
+## Fit model
+pcontentmodel_alllarvae <-
+  brms::brm(log(p_prcnt) ~
+              log(invert_mass_mg) + resource*site_pred + (1|bromspecies/country),
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "larva" & invert_mass_mg > 0))
+## Check assumptions
+plot(pcontentmodel_alllarvae)
+## Check effects
+t36 <- 
+  pairwise_contrasts(model = pcontentmodel_alllarvae, 
+                     both = T,
+                     invert_mass_mg = T)
+## Plot
+fig4c <- 
+  treatment_plot(model = pcontentmodel_alllarvae, 
+                 scale = "log",
+                 parameter = "p_prcnt_alllarvae", 
+                 bromeliads = bromeliads, 
+                 communities = pcontent %>% 
+                   dplyr::filter(stage == "larva"), 
+                 water = water, 
+                 emergence = emergence) +
+    scale_y_continuous(trans = "log",
+                       breaks = c(0.05, 1, 20))
+
+# Mosquito larvae  
+## Fit model
+pcontentmodel_culilarvae <-
+  brms::brm(log(p_prcnt) ~
+              log(invert_mass_mg) + resource*predator,
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.98,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "larva" & taxon == "Culicidae" & country == "bras"))
+## Check assumptions
+plot(pcontentmodel_culilarvae)
+## Check effects
+t37 <- 
+  pairwise_contrasts(pcontentmodel_culilarvae, 
+                     bras = T,
+                     invert_mass_mg = T)
+## Plot
+figs7b <-
+  treatment_plot(model = pcontentmodel_culilarvae, 
+                 scale = "log",
+                 parameter = "p_prcnt_culilarvae", 
+                 bromeliads = bromeliads, 
+                 communities = pcontent %>% 
+                   dplyr::filter(stage == "larva" & taxon == "Culicidae" & country == "bras"), 
+                 water = water, 
+                 emergence = emergence) +
+    scale_y_continuous(trans = "log",
+                       breaks = c(0.05, 0.5, 5, 50))
+
+# Tipulid larvae
+## Fit model
+pcontentmodel_tipularvae <-
+  brms::brm(log(p_prcnt) ~
+              log(invert_mass_mg) + resource*site_pred + (1|bromspecies/country),
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "larva" & taxon == "Tipulidae"))
+## Check assumptions
+plot(pcontentmodel_tipularvae)
+## Check effects
+t38 <- 
+  pairwise_contrasts(pcontentmodel_tipularvae, 
+                     both = T,
+                     invert_mass_mg = T)
+## Plot
+fig4d <- 
+  treatment_plot(model = pcontentmodel_tipularvae, 
+               scale = "log",
+               parameter = "p_prcnt_tipularvae", 
+               bromeliads = bromeliads, 
+               communities = pcontent %>% 
+                 dplyr::filter(stage == "larva" & taxon == "Tipulidae"), 
+               water = water, 
+               emergence = emergence) +
+  scale_y_continuous(trans = "log",
+                     breaks = c(0.01, 2, 50))
+
+# Scirtid larvae
+## Fit model
+pcontentmodel_scirlarvae <-
+  brms::brm(log(p_prcnt) ~
+              log(invert_mass_mg) + resource + (1|bromspecies),
+            iter = 5000,
+            family = gaussian(),      
+            control = list(adapt_delta = 0.99,
+                           max_treedepth = 15),
+            data = pcontent %>% 
+              dplyr::filter(stage == "larva" & taxon == "Scirtes" & country == "trini"))
+## Check assumptions
+plot(pcontentmodel_tipularvae)
+## Check effects
+t39 <- 
+  pairwise_contrasts(pcontentmodel_scirlarvae, 
+                     trini = T,
+                     invert_mass_mg = T)
+## Plot
+figs7c <-
+  treatment_plot(model = pcontentmodel_scirlarvae, 
+               scale = "log",
+               parameter = "p_prcnt_scirlarvae", 
+               bromeliads = bromeliads, 
+               communities = pcontent %>% 
+                 dplyr::filter(stage == "larva" & taxon == "Scirtes" & country == "trini"), 
+               water = water, 
+               emergence = emergence,
+               trini = T) +
+  scale_y_continuous(trans = "log",
+                     breaks = c(0.1, 0.3, 1))
 
 
 # Compiling figures -------------------------------------------------------
-# Figure 3, sig remaining
+# Figure 3, sig and emerged remaining
 ## Make legend
 legend <- 
   cowplot::get_legend(fig3a)
@@ -1270,14 +1480,25 @@ fig3 <-
                      fig3b +
                        theme(legend.position = "none") +
                        ggtitle("b"),
-                     legend,
-                     ncol = 3)
+                     fig3c +
+                       theme(legend.position = "none") +
+                       ggtitle("c"),
+                     fig3d +
+                       theme(legend.position = "none") +
+                       ggtitle("d"),
+                     ncol = 2)
+## Combine with legend
+fig3 <- 
+  cowplot::plot_grid(legend,
+                     fig3,
+                     nrow = 2,
+                     rel_heights = c(0.1, 0.9))
 ## Save figure
 ggsave(here::here("brastri", "www",
                   "fig3.jpg"),
        fig3,
        width = 9,
-       height = 4,
+       height = 9,
        bg = "white")
 
 
@@ -1332,12 +1553,12 @@ fig4 <-
                      fig4b +
                        theme(legend.position = "none") +
                        ggtitle("b"),
-                     # fig4c +
-                     #   theme(legend.position = "none") +
-                     #   ggtitle("c"),
-                     # fig4d +
-                     #   theme(legend.position = "none") +
-                     #   ggtitle("d"),
+                     fig4c +
+                       theme(legend.position = "none") +
+                       ggtitle("c"),
+                     fig4d +
+                       theme(legend.position = "none") +
+                       ggtitle("d"),
                      ncol = 2)
 ## Combine with legend
 fig4 <- 
@@ -1350,12 +1571,12 @@ fig4 <-
 ggsave(here::here("brastri", "www",
                   "fig4.jpg"),
        fig4,
-       width = 10,
-       height = 6,
+       width = 9,
+       height = 9,
        bg = "white")
 
 
-# Figure s5, unsig leftover
+# Figure s5, unsig leftover bio/body mass
 ## Make figure
 figs5 <- 
   cowplot::plot_grid(figs5a +
@@ -1386,6 +1607,49 @@ ggsave(here::here("brastri", "www",
                   "figs5.jpg"),
        figs5,
        width = 7,
+       height = 9,
+       bg = "white")
+
+# Figure s6, unsig leftover abundance
+## Make figure
+figs6 <- 
+  cowplot::plot_grid(figs6a +
+                       theme(legend.position = "none") +
+                       ggtitle("a"),
+                     figs6b +
+                       theme(legend.position = "none") +
+                       ggtitle("b"),
+                     figs6c +
+                       theme(legend.position = "none") +
+                       ggtitle("c"),
+                     legend,
+                     ncol = 2)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "figs6.jpg"),
+       figs6,
+       width = 9,
+       height = 9,
+       bg = "white")
+
+# Make figure
+figs7 <- 
+  cowplot::plot_grid(figs7a +
+                       theme(legend.position = "none") +
+                       ggtitle("a"),
+                     figs7b +
+                       theme(legend.position = "none") +
+                       ggtitle("b"),
+                     figs7c +
+                       theme(legend.position = "none") +
+                       ggtitle("c"),
+                     legend,
+                     ncol = 2)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "figs7.jpg"),
+       figs7,
+       width = 9,
        height = 9,
        bg = "white")
 
