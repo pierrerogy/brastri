@@ -424,24 +424,46 @@ readr::write_csv(table_2,
 # Figure 2 - sig associations
 ## Get legend
 legend <- 
-  cowplot::get_legend(fig2a)
+  cowplot::get_legend(fig2a +
+                        theme(legend.text = element_text(size = rel(1.2)),
+                              legend.title = element_text(size = rel(1.2))))
 ## Generate figure
 fig2 <- 
   cowplot::plot_grid(fig2a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(a)"),
                      fig2b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(b)"),
                      fig2c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(c)"),
                      fig2d +
-                       theme(legend.position = "none") +
-                       ggtitle("d"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(d)"),
                      fig2e +
-                       theme(legend.position = "none") +
-                       ggtitle("e"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(e)"),
                      legend,
                      ncol = 2)
 ## Save figure
@@ -457,17 +479,33 @@ ggsave(here::here("brastri", "www",
 ## Make figure
 figs1 <- 
   cowplot::plot_grid(figs1a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(a)"),
                      figs1b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(b)"),
                      figs1c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(c)"),
                      figs1d +
-                       theme(legend.position = "none") +
-                       ggtitle("d"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.2)),
+                             axis.text.x = element_text(size = rel(1.2)),
+                             axis.text.y = element_text(size = rel(1.2)),
+                             axis.title.y = element_text(size = rel(1.2))) +
+                       ggtitle("(d)"),
                      ncol = 2)
 ## Combine with legend
 legend <- 

@@ -530,26 +530,6 @@ figs3b <-
                    dplyr::filter(stringr::str_detect(string = species,
                                                      pattern = "Tipu")))
 
-# Generate figure
-## Make figure
-figs3 <- 
-  cowplot::plot_grid(figs3a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
-                     figs3b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
-                     legend,
-                     ncol = 3)
-
-## Save figure
-ggsave(here::here("brastri", "www",
-                  "figs3.jpg"),
-       figs3,
-       width = 10,
-       height = 4,
-       bg = "white")
-
 
 # Table summarising results
 ## Make table
@@ -738,38 +718,6 @@ figs4e <-
                  communities = community, 
                  water = water, 
                  emergence = dats)
-
-# Figure of all results
-# Generate figure
-## Get legend
-legend <- 
-  cowplot::get_legend(figs4a)
-## Make figure
-figs4 <- 
-  cowplot::plot_grid(figs4a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
-                     figs4b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
-                     figs4c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
-                     figs4d +
-                       theme(legend.position = "none") +
-                       ggtitle("d"),
-                     figs4e +
-                       theme(legend.position = "none") +
-                       ggtitle("e"),
-                     legend,
-                     ncol = 2)
-## Save figure
-ggsave(here::here("brastri", "www",
-                  "figs4.jpg"),
-       figs4,
-       width = 9,
-       height = 11,
-       bg = "white")
 
 # Table summarising results
 ## Make table
@@ -1471,21 +1419,39 @@ figs7c <-
 # Figure 3, sig and emerged remaining
 ## Make legend
 legend <- 
-  cowplot::get_legend(fig3a)
+  cowplot::get_legend(fig3a +
+                        theme(legend.text = element_text(size = rel(1.1)),
+                              legend.title= element_text(size = rel(1.1))))
 ## Make figure
 fig3 <- 
   cowplot::plot_grid(fig3a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(a)"),
                      fig3b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(b)"),
                      fig3c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(c)"),
                      fig3d +
-                       theme(legend.position = "none") +
-                       ggtitle("d"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(d)"),
                      ncol = 2)
 ## Combine with legend
 fig3 <- 
@@ -1501,64 +1467,43 @@ ggsave(here::here("brastri", "www",
        height = 9,
        bg = "white")
 
-
-# Figure s2, unsig remaining biomass
-## Make figure
-figs2 <- 
-  cowplot::plot_grid(figs2a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
-                     figs2b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
-                     figs2c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
-                     figs2d +
-                       theme(legend.position = "none") +
-                       ggtitle("d"),
-                     figs2e +
-                       theme(legend.position = "none") +
-                       ggtitle("e"),
-                     figs2f +
-                       theme(legend.position = "none") +
-                       ggtitle("f"),
-                     figs2g +
-                       theme(legend.position = "none") +
-                       ggtitle("g"),
-                     figs2h +
-                       theme(legend.position = "none") +
-                       ggtitle("h"),
-                     legend,
-                     ncol = 2)
-## Save figure
-ggsave(here::here("brastri", "www",
-                  "figs2.jpg"),
-       figs2,
-       width = 7,
-       height = 12,
-       bg = "white")
-
-
 # Figure 4, sig re and P content
 # Generate figure
 ## Get legend
 legend <- 
-  cowplot::get_legend(fig4a)
+  cowplot::get_legend(fig4a + 
+                        theme(legend.text = element_text(size = rel(1.1)),
+                              legend.title= element_text(size = rel(1.1))))
 ## Make figure
 fig4 <- 
   cowplot::plot_grid(fig4a +
-                       theme(legend.position = "none") +
-                       ggtitle("a"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(a)"),
                      fig4b +
-                       theme(legend.position = "none") +
-                       ggtitle("b"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(b)"),
                      fig4c +
-                       theme(legend.position = "none") +
-                       ggtitle("c"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(c)"),
                      fig4d +
-                       theme(legend.position = "none") +
-                       ggtitle("d"),
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(d)"),
                      ncol = 2)
 ## Combine with legend
 fig4 <- 
@@ -1576,30 +1521,149 @@ ggsave(here::here("brastri", "www",
        bg = "white")
 
 
+# Figure s2, unsig remaining biomass
+## Make figure
+figs2 <- 
+  cowplot::plot_grid(figs2a +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(a)"),
+                     figs2b +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(b)"),
+                     figs2c +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(c)"),
+                     figs2d +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(d)"),
+                     figs2e +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(e)"),
+                     figs2f +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(f)"),
+                     figs2g +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(g)"),
+                     figs2h +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(h)"),
+                     legend,
+                     ncol = 2)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "figs2.jpg"),
+       figs2,
+       width = 7,
+       height = 12,
+       bg = "white")
+
+# Fig s3, number of daays until emergence
+## Make figure
+figs3 <- 
+  cowplot::plot_grid(figs3a +
+                       theme(legend.position = "none") +
+                       ggtitle("(a)"),
+                     figs3b +
+                       theme(legend.position = "none") +
+                       ggtitle("(b)"),
+                     legend,
+                     ncol = 3)
+
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "figs3.jpg"),
+       figs3,
+       width = 10,
+       height = 4,
+       bg = "white")
+
+# n insect emerged
+## Make figure
+figs4 <- 
+  cowplot::plot_grid(figs4a +
+                       theme(legend.position = "none") +
+                       ggtitle("(a)"),
+                     figs4b +
+                       theme(legend.position = "none") +
+                       ggtitle("(b)"),
+                     figs4c +
+                       theme(legend.position = "none") +
+                       ggtitle("(c)"),
+                     figs4d +
+                       theme(legend.position = "none") +
+                       ggtitle("(d)"),
+                     figs4e +
+                       theme(legend.position = "none") +
+                       ggtitle("(e)"),
+                     legend,
+                     ncol = 2)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "figs4.jpg"),
+       figs4,
+       width = 9,
+       height = 11,
+       bg = "white")
+
+
+
 # Figure s5, unsig leftover bio/body mass
 ## Make figure
 figs5 <- 
   cowplot::plot_grid(figs5a +
                        theme(legend.position = "none") +
-                       ggtitle("a"),
+                       ggtitle("(a)"),
                      figs5b +
                        theme(legend.position = "none") +
-                       ggtitle("b"),
+                       ggtitle("(b)"),
                      figs5c +
                        theme(legend.position = "none") +
-                       ggtitle("c"),
+                       ggtitle("(c)"),
                      figs5d +
                        theme(legend.position = "none") +
-                       ggtitle("d"),
+                       ggtitle("(d)"),
                      figs5e +
                        theme(legend.position = "none") +
-                       ggtitle("e"),
+                       ggtitle("(e)"),
                      figs5f +
                        theme(legend.position = "none") +
-                       ggtitle("f"),
+                       ggtitle("(f)"),
                      figs5g +
                        theme(legend.position = "none") +
-                       ggtitle("g"),
+                       ggtitle("(g)"),
                      legend,
                      ncol = 2)
 ## Save figure
@@ -1607,7 +1671,7 @@ ggsave(here::here("brastri", "www",
                   "figs5.jpg"),
        figs5,
        width = 7,
-       height = 9,
+       height = 10,
        bg = "white")
 
 # Figure s6, unsig leftover abundance
@@ -1615,13 +1679,13 @@ ggsave(here::here("brastri", "www",
 figs6 <- 
   cowplot::plot_grid(figs6a +
                        theme(legend.position = "none") +
-                       ggtitle("a"),
+                       ggtitle("(a)"),
                      figs6b +
                        theme(legend.position = "none") +
-                       ggtitle("b"),
+                       ggtitle("(b)"),
                      figs6c +
                        theme(legend.position = "none") +
-                       ggtitle("c"),
+                       ggtitle("(c)"),
                      legend,
                      ncol = 2)
 ## Save figure
@@ -1636,13 +1700,13 @@ ggsave(here::here("brastri", "www",
 figs7 <- 
   cowplot::plot_grid(figs7a +
                        theme(legend.position = "none") +
-                       ggtitle("a"),
+                       ggtitle("(a)"),
                      figs7b +
                        theme(legend.position = "none") +
-                       ggtitle("b"),
+                       ggtitle("(b)"),
                      figs7c +
                        theme(legend.position = "none") +
-                       ggtitle("c"),
+                       ggtitle("(c)"),
                      legend,
                      ncol = 2)
 ## Save figure
