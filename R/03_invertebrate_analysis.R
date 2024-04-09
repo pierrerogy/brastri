@@ -206,7 +206,7 @@ t11 <-
   pairwise_contrasts(emergencemodel_chiro, 
                      both = T)
 ## Plot
-fig3a <- 
+figs2c <- 
   treatment_plot(model = emergencemodel_chiro, 
                  scale = "none",
                  parameter = "emergence_chir_tot", 
@@ -237,7 +237,7 @@ t12 <-
   pairwise_contrasts(emergencemodel_culi, 
                      bras = T)
 ## Plot
-figs2c <- 
+figs2d <- 
   treatment_plot(model = emergencemodel_culi, 
                  scale = "none",
                  parameter = "emergence_culi_tot", 
@@ -268,7 +268,7 @@ t13 <-
   pairwise_contrasts(emergencemodel_tipu, 
                      both = T)
 ## Plot
-figs2d <- 
+figs2e <- 
   treatment_plot(model = emergencemodel_tipu, 
                  scale = "none",
                  parameter = "emergence_tipu_tot", 
@@ -299,7 +299,7 @@ t14 <-
   pairwise_contrasts(emergencemodel_cera, 
                      bras = T)
 ## Plot
-figs2e <- 
+figs2f <- 
   treatment_plot(model = emergencemodel_cera, 
                  scale = "none",
                  parameter = "emergence_cera_tot", 
@@ -347,7 +347,7 @@ t15 <-
   pairwise_contrasts(indemergencemodel_chiro, 
                    both = T)
 ## Plot
-figs2f <- 
+figs2g<- 
   treatment_plot(model = indemergencemodel_chiro, 
                  scale = "none",
                  parameter = "emergence_chir_ind", 
@@ -379,7 +379,7 @@ t16 <-
   pairwise_contrasts(indemergencemodel_culi, 
                      bras = T)
 ## Plot
-figs2g <- 
+figs2h <- 
   treatment_plot(model = indemergencemodel_culi, 
                  scale = "none",
                  parameter = "emergence_culi_ind", 
@@ -411,7 +411,7 @@ t17 <-
   pairwise_contrasts(indemergencemodel_tipu, 
                      both = T)
 ## Plot
-figs2h <- 
+figs2i <- 
   treatment_plot(model = indemergencemodel_tipu, 
                  scale = "none",
                  parameter = "emergence_tipu_ind", 
@@ -443,7 +443,7 @@ t18 <-
   pairwise_contrasts(indemergencemodel_cera, 
                      bras = T)
 ## Plot
-fig3b <- 
+fig3a <- 
   treatment_plot(model = indemergencemodel_cera, 
                  scale = "none",
                  parameter = "emergence_cera_ind", 
@@ -980,7 +980,7 @@ t30 <-
   pairwise_contrasts(indleftovermodel_culi, 
                      bras = T)
 ## Plot
-fig3c <- 
+fig3b <- 
   treatment_plot(model = indleftovermodel_culi, 
                  scale = "none",
                  parameter = "leftover_culi_ind", 
@@ -1045,7 +1045,7 @@ t32 <-
   pairwise_contrasts(indleftovermodel_scir, 
                      trini = T)
 ## Plot
-fig3d <- 
+fig3c <- 
   treatment_plot(model = indleftovermodel_scir, 
                  scale = "none",
                  parameter = "leftover_scir_ind", 
@@ -1445,20 +1445,8 @@ fig3 <-
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
                        ggtitle("(c)"),
-                     fig3d +
-                       theme(legend.position = "none",
-                             axis.title.x = element_text(size = rel(1.1)),
-                             axis.text.x = element_text(size = rel(1.1)),
-                             axis.text.y = element_text(size = rel(1.1)),
-                             axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(d)"),
+                     legend,
                      ncol = 2)
-## Combine with legend
-fig3 <- 
-  cowplot::plot_grid(legend,
-                     fig3,
-                     nrow = 2,
-                     rel_heights = c(0.1, 0.9))
 ## Save figure
 ggsave(here::here("brastri", "www",
                   "fig3.jpg"),
@@ -1580,13 +1568,20 @@ figs2 <-
                              axis.text.y = element_text(size = rel(1)),
                              axis.title.y = element_text(size = rel(1))) +
                        ggtitle("(h)"),
+                     figs2i +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1)),
+                             axis.text.x = element_text(size = rel(1)),
+                             axis.text.y = element_text(size = rel(1)),
+                             axis.title.y = element_text(size = rel(1))) +
+                       ggtitle("(i)"),
                      legend,
-                     ncol = 2)
+                     ncol = 3)
 ## Save figure
 ggsave(here::here("brastri", "www",
                   "figs2.jpg"),
        figs2,
-       width = 7,
+       width = 9,
        height = 12,
        bg = "white")
 
@@ -1717,3 +1712,67 @@ ggsave(here::here("brastri", "www",
        height = 9,
        bg = "white")
 
+
+
+# Custom figures for condensed version ------------------------------------
+# Essentially condensing figs 3 and 4
+fig_condensed3 <- 
+  ## Make figure
+  cowplot::plot_grid(fig3a +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(a)"),
+                     legend,
+                     fig3b +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(b)"),
+                     fig3c +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(c)"),
+                     fig4a +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(d)"),
+                     fig4b +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(e)"),
+                     fig4c +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(f)"),
+                     fig4d +
+                       theme(legend.position = "none",
+                             axis.title.x = element_text(size = rel(1.1)),
+                             axis.text.x = element_text(size = rel(1.1)),
+                             axis.text.y = element_text(size = rel(1.1)),
+                             axis.title.y = element_text(size = rel(1.1))) +
+                       ggtitle("(g)"),
+                     ncol = 2)
+## Save figure
+ggsave(here::here("brastri", "www",
+                  "fig_condensed3.jpg"),
+       fig_condensed3,
+       width = 8,
+       height = 12,
+       bg = "white")
