@@ -6,7 +6,7 @@ library(here)
 library(brms)
 library(emmeans)
 library(bayestestR)
-source(here::here("brastri",
+source(here::here("R", 
                   "functions.R"))
 
 
@@ -14,7 +14,7 @@ source(here::here("brastri",
 # Load data ---------------------------------------------------------------
 # Water chemistry
 water <-
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "water_data.csv")) %>% 
   ## Make day date and remove chlorophyll in trini
   dplyr::mutate(day = lubridate::dmy(day),
@@ -23,7 +23,7 @@ water <-
   ## Remove tap
   dplyr::filter(bromeliad_id != "tap") %>% 
   ## Add decomposition values
-  dplyr::left_join(readr::read_csv(here::here("brastri", "data",
+  dplyr::left_join(readr::read_csv(here::here("data",
                                               "bromeliad_data.csv")) %>% 
                      dplyr::select(country, bromeliad_id, contains(c("_dry", "_normal"))),
                    by = c("country", "bromeliad_id")) %>% 
@@ -42,7 +42,7 @@ contrasts(water$site_pred) <-
 
 # Aquatic communities
 community <-
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "community_data.csv")) %>% 
   ## Remove ci columns
   dplyr::select(-contains("ci"), -size_used_mm, -bwg_name, -path, -size_original, -day,
@@ -50,7 +50,7 @@ community <-
 
 ## Bromeliads
 bromeliads <-
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "bromeliad_data.csv")) %>% 
   ## Keep experimental bromeliads only
   dplyr::filter(stringr::str_detect(string = bromeliad_id, patter = "E")) %>% 
@@ -59,7 +59,7 @@ bromeliads <-
 
 # Emergence
 emergence <- 
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "emergence_data.csv"))
   
 
@@ -172,7 +172,7 @@ fig2a <-
 # Phosphate ppm
 ## Fit model
 pppmmodel <-
-  brms::brm(log(phosphate_ppm + 0.001)  ~
+  brms::brm(phosphate_ppm + 0.001  ~
               resource + (1|day) + (1|bromeliad_id/bromspecies),
             iter = 2000,
             family = gaussian(link = "identity"),    
@@ -189,20 +189,19 @@ t5 <-
 fig2b <- 
   treatment_plot(model = pppmmodel, 
                  parameter = "PPPM", 
-                 scale = "log", 
+                 scale = "none", 
                  bromeliads = bromeliads, 
                  communities = communities, 
                  water = water, 
                  emergence = emergence,
                  trini = TRUE)
-
 # Chlorophyll
 ## Fit model
 chloromodel <-
-  brms::brm(log(chloro_ugL + 0.001)  ~
+  brms::brm(chloro_ugL + 0.001  ~
               resource*predator + (1|day) + (1|bromeliad_id),
             iter = 2000,
-            family = gaussian(link = "identity"),    
+            family = lognormal(),    
             control = list(adapt_delta = 0.97,
                            max_treedepth = 10),
             data = water %>% 
@@ -221,20 +220,9 @@ fig2c <-
                  bromeliads = bromeliads, 
                  communities = communities, 
                  water = water, 
-                 emergence = emergence)
-
-# Generate table with outputs
-table_1 <- 
-  t1 %>% 
-  dplyr::bind_rows(list(t2,
-                        t3,
-                        t4,
-                        t5,
-                        t6))
-## Save table
-readr::write_csv(table_1,
-                 here::here("brastri", "data",
-                            "table_1.csv"))
+                 emergence = emergence) +
+  scale_y_continuous(breaks = c(-9, -7.5, -5, -2.5, 0),
+                     labels = c(0, 0.001, 0.005, 0.1, 1))
 
 # Treatments on decomposition  ---------------------------------
 # Decomposition coarse dry BR
@@ -407,19 +395,6 @@ water %>%
   dplyr::distinct() %>% 
   dplyr::filter(country == "trini")
 
-# Generate table with outputs
-table_2 <- 
-  t7a %>% 
-  dplyr::bind_rows(list(t7b,
-                        t8a))
-# Save table
-readr::write_csv(table_2,
-                 here::here("brastri", "data",
-                            "table_2.csv"))
-
-
-
-
 # Combine figures ---------------------------------------------------------
 # Figure 2 - sig associations
 ## Get legend
@@ -467,7 +442,7 @@ fig2 <-
                      legend,
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "fig2.jpg"),
        fig2,
        width = 10,
@@ -516,7 +491,7 @@ figs1 <-
                      nrow = 2,
                      rel_heights = c(0.1, 0.9))
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs1.jpg"),
        figs1,
        width = 10,

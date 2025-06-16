@@ -7,18 +7,13 @@ library(here)
 library(brms)
 library(emmeans)
 library(bayestestR)
-source(here::here("brastri",
+source(here::here("R",
                   "functions.R"))
-
-# remove.packages(c("rstan","StanHeaders"))
-# install.packages("StanHeaders", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-# install.packages("rstan", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-
 
 # Load data ---------------------------------------------------------------
 # Aquatic communities
 community <-
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "community_data.csv")) %>% 
   ## Remove ci columns
   dplyr::select(-contains("ci_"), -path,  -day,
@@ -38,7 +33,7 @@ contrasts(community$site_pred) <-
 
 # Bromeliads
 bromeliads <-
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "bromeliad_data.csv")) %>% 
   ## Keep experimental bromeliads only
   dplyr::filter(stringr::str_detect(string = bromeliad_id, 
@@ -60,7 +55,7 @@ contrasts(community$site_pred) <-
 
 # Emergence data
 emergence <- 
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "emergence_data.csv")) %>% 
   ## Rename one column for the time being
   dplyr::rename(bromeliad = bromspecies,
@@ -107,13 +102,16 @@ emergence_selected <-
 
 # P content
 pcontent <-
-  readr::read_csv(here::here("brastri", "data",
+  readr::read_csv(here::here("data",
                              "pcontent.csv")) %>% 
   ## Add new treatment
   dplyr::mutate(site_pred = factor(ifelse(country == "trini",
                                           "trini", ifelse(country == "bras" & predator == "present",
                                                           "bras_present", "bras_absent")),
-                                   levels = c("bras_absent", "bras_present", "trini")))
+                                   levels = c("bras_absent", "bras_present", "trini"))) %>% 
+  ## Add average body mass
+  dplyr::mutate(avg_body_mass = invert_mass_mg/n_indiv)
+  
 ## Do contrasts
 contrasts(pcontent$site_pred) <- 
   matrix(c(-0.5, -0.5, 1,
@@ -311,21 +309,6 @@ figs2f <-
                                                  group = "Cera") %>% 
                    dplyr::filter(country == "bras"))
 
-# Table summarising results
-## Make table 
-table_4 <- 
-  t9 %>% 
-  dplyr::bind_rows(list(t10,
-                        t11,
-                        t12,
-                        t13,
-                        t14))
-
-## Save table
-readr::write_csv(table_4,
-                 here::here("brastri", "data",
-                            "table_4.csv"))
-
 # Models on individual emerged body mass ----------------------------------
 # Chironomidae
 ## Fit model
@@ -455,20 +438,6 @@ fig3a <-
                    dplyr::filter(stringr::str_detect(string = species,
                                                      pattern = "Cera")))
 
-# Table summarising results
-## Make table
-table_5 <- 
-  t15 %>% 
-  dplyr::bind_rows(list(t16,
-                        t17,
-                        t18))
-
-## Save table
-readr::write_csv(table_5,
-                 here::here("brastri", "data",
-                            "table_5.csv"))
-
-
 # Models on growth rate ---------------------------------------------------
 # Culicidae
 ## Fit model
@@ -529,20 +498,6 @@ figs3b <-
                  emergence = emergence_selected %>% 
                    dplyr::filter(stringr::str_detect(string = species,
                                                      pattern = "Tipu")))
-
-
-# Table summarising results
-## Make table
-table_6 <- 
-  t19 %>% 
-  dplyr::bind_rows(t20)
-
-## Save table
-readr::write_csv(table_6,
-                 here::here("brastri", "data",
-                            "table_6.csv"))
-
-
 
 # Models on proportion emerging, or number emerged -------------------------------------------
 # Seeded individuals
@@ -718,19 +673,6 @@ figs4e <-
                  communities = community, 
                  water = water, 
                  emergence = dats)
-
-# Table summarising results
-## Make table
-table_7 <- 
-  t21 %>% 
-  dplyr::bind_rows(list(t22,
-                        t23,
-                        t50,
-                        t51))
-## Save table
-readr::write_csv(table_7,
-                 here::here("brastri", "data",
-                            "table_7.csv"))
 
 # Models on total final biomass -------------------------------------------------
 # Prepare data
@@ -937,20 +879,6 @@ figs5f <-
                  emergence = emergence,
                  trini = T)
 
-# Table summarising results
-## Make table
-table_8 <- 
-  t24 %>% 
-  dplyr::bind_rows(list(t25,
-                        t26,
-                        t27,
-                        t28,
-                        t29))
-## Save table
-readr::write_csv(table_8,
-                 here::here("brastri", "data",
-                            "table_8.csv"))
-
 # Models on individual leftover body mass ----------------------------------
 # Chironomidae ONLY FROM SIMLA IN CONTROL BROMELIADS
 ## Fit model
@@ -1057,19 +985,6 @@ fig3c <-
                  water = water, 
                  emergence = emergence,
                  trini = T)
-# Table summarising results
-## Make table
-table_9 <- 
-  t30 %>% 
-  dplyr::bind_rows(list(t31,
-                        t32))
-
-## Save table
-readr::write_csv(table_9,
-                 here::here("brastri", "data",
-                            "table_9.csv"))
-
-
 
 # Models on number of individuals remaining -------------------------------
 # Chironomidae ONLY FROM SIMLA IN CONTROL BROMELIADS
@@ -1185,17 +1100,6 @@ figs6c <-
                  water = water, 
                  emergence = emergence,
                  trini = T)
-# Table summarising results
-## Make table
-table_10 <- 
-  t33 %>% 
-  dplyr::bind_rows(list(t34,
-                        t35))
-
-## Save table
-readr::write_csv(table_10,
-                 here::here("brastri", "data",
-                            "table_10.csv"))
 
 # Model on P content - adults ------------------------------------------------------
 # All adults  
@@ -1293,7 +1197,7 @@ fig4b <-
 ## Fit model
 pcontentmodel_alllarvae <-
   brms::brm(log(p_prcnt) ~
-              log(invert_mass_mg) + resource*site_pred + (1|bromspecies/country),
+              log(avg_body_mass) + resource*site_pred + (1|bromspecies/country),
             iter = 5000,
             family = gaussian(),      
             control = list(adapt_delta = 0.99,
@@ -1324,7 +1228,7 @@ fig4c <-
 ## Fit model
 pcontentmodel_culilarvae <-
   brms::brm(log(p_prcnt) ~
-              log(invert_mass_mg) + resource*predator,
+              log(avg_body_mass) + resource*predator,
             iter = 5000,
             family = gaussian(),      
             control = list(adapt_delta = 0.98,
@@ -1355,7 +1259,7 @@ figs7b <-
 ## Fit model
 pcontentmodel_tipularvae <-
   brms::brm(log(p_prcnt) ~
-              log(invert_mass_mg) + resource*site_pred + (1|bromspecies/country),
+              log(avg_body_mass) + resource*site_pred + (1|bromspecies/country),
             iter = 5000,
             family = gaussian(),      
             control = list(adapt_delta = 0.99,
@@ -1386,7 +1290,7 @@ fig4d <-
 ## Fit model
 pcontentmodel_scirlarvae <-
   brms::brm(log(p_prcnt) ~
-              log(invert_mass_mg) + resource + (1|bromspecies),
+              log(avg_body_mass) + resource + (1|bromspecies),
             iter = 5000,
             family = gaussian(),      
             control = list(adapt_delta = 0.99,
@@ -1448,7 +1352,7 @@ fig3 <-
                      legend,
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "fig3.jpg"),
        fig3,
        width = 9,
@@ -1501,7 +1405,7 @@ fig4 <-
                      rel_heights = c(0.1, 0.9))
 
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "fig4.jpg"),
        fig4,
        width = 9,
@@ -1578,7 +1482,7 @@ figs2 <-
                      legend,
                      ncol = 3)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs2.jpg"),
        figs2,
        width = 9,
@@ -1598,7 +1502,7 @@ figs3 <-
                      ncol = 3)
 
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs3.jpg"),
        figs3,
        width = 10,
@@ -1626,7 +1530,7 @@ figs4 <-
                      legend,
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs4.jpg"),
        figs4,
        width = 9,
@@ -1662,7 +1566,7 @@ figs5 <-
                      legend,
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs5.jpg"),
        figs5,
        width = 7,
@@ -1684,7 +1588,7 @@ figs6 <-
                      legend,
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs6.jpg"),
        figs6,
        width = 9,
@@ -1705,7 +1609,7 @@ figs7 <-
                      legend,
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "figs7.jpg"),
        figs7,
        width = 9,
@@ -1770,7 +1674,7 @@ fig_condensed3 <-
                        ggtitle("(g)"),
                      ncol = 2)
 ## Save figure
-ggsave(here::here("brastri", "www",
+ggsave(here::here("plots",
                   "fig_condensed3.jpg"),
        fig_condensed3,
        width = 8,

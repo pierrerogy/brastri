@@ -3,7 +3,7 @@
 # Load libraries
 library(tidyverse)
 library(here)
-source(here::here("brastri",
+source(here::here("R",
                   "functions.R"))
 library(hellometry)
 
@@ -121,7 +121,7 @@ readr::write_csv(bromeliad_data %>%
                    ## Rename one bromeliad to avoid confusion later on
                    dplyr::mutate(bromeliad_id = ifelse(bromeliad_id == "E",
                                                        "F", bromeliad_id)),
-                 here::here("brastri", "data",
+                 here::here("data",
                             "bromeliad_data.csv"))
 
 # Water parameters --------------------------------------------------------
@@ -224,7 +224,7 @@ water_data <-
 
 ## Save data
 readr::write_csv(water_data,
-                 here::here("brastri", "data",
+                 here::here("data",
                             "water_data.csv"))
 
 
@@ -302,10 +302,71 @@ community_data <-
                                "adult", ifelse(stringr::str_detect(string = species, 
                                                                    pattern = "pupa") & 
                                                  !is.na(species),
-                               "pupa", stage))) %>%
-  hellometry::add_taxonomy() %>%
+                               "pupa", stage)))
+
+## Add the missing columns
+community_data <- 
+  community_data %>% 
+  # extra cols for everyone
+  dplyr::mutate(domain = "Eukaryota",
+                kingdom = "Animalia",
+                subphylum = NA,
+                tribe = NA) %>% 
+  # extra cols that change
+  dplyr::mutate(phylum = ifelse(class == "Hexapoda",
+                                "Arthropoda", "Annelida"),
+                subclass = ifelse(class == "Clitellata" & 
+                                    stringr::str_detect(string = species,
+                                                        pattern = "leech"),
+                                  "Hirudinea", ifelse(
+                                    class == "Clitellata" & 
+                                      !stringr::str_detect(string = species,
+                                                           pattern = "leech"),
+                                    "Oligochaeta", ifelse(
+                                      class == "Hexapoda",
+                                      "Neoptera", NA))),
+                subord = ifelse(family %in% c("Chironomidae", "Tipulidae",
+                                              "Ceratopogonidae",
+                                              "Culicidae", "Psychodidae"),
+                                "Nematocera", NA)) %>% 
+  # Relocate
+  dplyr::relocate(domain, kingdom, phylum, subphylum,
+                  .before = class) %>% 
+  dplyr::relocate(subclass,
+                  .after = class) %>% 
+  dplyr::relocate(subord,
+                  .after = ord) %>% 
+  dplyr::relocate(tribe,
+                  .after = subfamily)
+
+## Modify values
+community_data <- 
+  community_data %>% 
+  dplyr::mutate(genus = ifelse(genus == "Weomyia" & !is.na(genus),
+                               "Wyeomyia", genus),
+                class = ifelse(ord == "Clitellata"& !is.na(ord),
+                               "Clitellata", class),
+                ord = ifelse(ord == "Clitellata"& !is.na(ord),
+                               NA, ord),
+                ord = ifelse(ord == "Oligochaeta"& !is.na(ord),
+                                NA, ord),
+                family = ifelse(family == "Oligochaeta"& !is.na(family),
+                                NA, family),
+                family = ifelse(genus == "Wyeomyia" & !is.na(genus), 
+                                "Culicidae", family),
+                family = ifelse(subfamily %in% c("Tanypodinae", "Chironominae") & !is.na(subfamily),
+                                "Chironomidae", family),
+                family = ifelse(genus == "Trentepohlia" & !is.na(genus),
+                                "Tipulidae", family))
+
+
+
+# Get biomass
+community_data <-
+  community_data %>%
   hellometry::hello_metry()
 
+  
 # Explore data to confirm there is nothing wrong
 hist(as.numeric(community_data$size_original))
 hist(as.numeric(community_data$biomass_mg)) 
@@ -316,28 +377,9 @@ unique(community_data$subfamily)
 unique(community_data$genus)
 unique(community_data$species)
 
-## Modify values
-community_data <- 
-  community_data %>% 
-  dplyr::mutate(genus = ifelse(genus == "Weomyia",
-                               "Wyeomyia", genus),
-                class = ifelse(ord == "Clitellata",
-                               "Clitellata", class),
-                ord = ifelse(family == "Oligochaeta",
-                             "Oligochaeta", ord),
-                family = ifelse(family == "Oligochaeta",
-                                NA, family),
-                family = ifelse(genus == "Wyeomyia", 
-                                "Culicidae", family),
-                family = ifelse(subfamily %in% c("Tanypodinae", "Chironominae"),
-                                "Chironomidae", family),
-                family = ifelse(genus == "Trentepohlia",
-                                "Tipulidae", family))
-
 ## Save data
 readr::write_csv(community_data,
-                 here::here("brastri", "data",
-                            "community_data.csv"))
+                 here::here("community_data.csv"))
 
 # Emerged -----------------------------------------------------------------
 # Read data
@@ -417,7 +459,7 @@ emergence_data <-
 
 ## Save data
 readr::write_csv(emergence_data,
-                 here::here("brastri", "data",
+                 here::here("data",
                             "emergence_data.csv"))
 
 
@@ -463,6 +505,6 @@ temp1 <-
 
 # Save data
 readr::write_csv(temp1,
-                 here::here("brastri", "data",
+                 here::here("data",
                             "pcontent.csv"))
 
