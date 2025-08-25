@@ -98,7 +98,13 @@ emergence_selected <-
                 biomass_type = "dry") %>% 
   ## Get biomass for missing values
   hellometry::add_taxonomy() %>% 
-  hellometry::hello_metry()
+  hellometry::hellometry(level_list = c("bwg_name", "species", "genus",
+                                        "tribe", "subfamily", "family",
+                                        "subord", "ord", "subclass", "class"))
+## Only keep original data
+emergence_selected <- 
+  emergence_selected$data
+
 
 # P content
 pcontent <-
@@ -1334,21 +1340,42 @@ fig3 <-
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(a)"),
+                       ggtitle("(a)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig3b +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.1)),
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(b)"),
+                       ggtitle("(b)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig3c +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.1)),
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(c)"),
+                       ggtitle("(c)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      legend,
                      ncol = 2)
 ## Save figure
@@ -1374,28 +1401,56 @@ fig4 <-
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(a)"),
+                       ggtitle("(a)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig4b +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.1)),
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(b)"),
+                       ggtitle("(b)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig4c +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.1)),
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(c)"),
+                       ggtitle("(c)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig4d +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.1)),
                              axis.text.x = element_text(size = rel(1.1)),
                              axis.text.y = element_text(size = rel(1.1)),
                              axis.title.y = element_text(size = rel(1.1))) +
-                       ggtitle("(d)"),
+                       ggtitle("(d)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      ncol = 2)
 ## Combine with legend
 fig4 <- 

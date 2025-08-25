@@ -9,8 +9,6 @@ library(bayestestR)
 source(here::here("R", 
                   "functions.R"))
 
-
-
 # Load data ---------------------------------------------------------------
 # Water chemistry
 water <-
@@ -216,13 +214,11 @@ t6 <-
 fig2c <- 
   treatment_plot(model = chloromodel, 
                  parameter = "Chlorophyll-a", 
-                 scale = "none", 
+                 scale = "chloroscale", 
                  bromeliads = bromeliads, 
                  communities = communities, 
                  water = water, 
-                 emergence = emergence) +
-  scale_y_continuous(breaks = c(-9, -7.5, -5, -2.5, 0),
-                     labels = c(0, 0.001, 0.005, 0.1, 1))
+                 emergence = emergence) 
 
 # Treatments on decomposition  ---------------------------------
 # Decomposition coarse dry BR
@@ -410,35 +406,70 @@ fig2 <-
                              axis.text.x = element_text(size = rel(1.2)),
                              axis.text.y = element_text(size = rel(1.2)),
                              axis.title.y = element_text(size = rel(1.2))) +
-                       ggtitle("(a)"),
+                       ggtitle("(a)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig2b +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.2)),
                              axis.text.x = element_text(size = rel(1.2)),
                              axis.text.y = element_text(size = rel(1.2)),
                              axis.title.y = element_text(size = rel(1.2))) +
-                       ggtitle("(b)"),
+                       ggtitle("(b)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig2c +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.2)),
                              axis.text.x = element_text(size = rel(1.2)),
                              axis.text.y = element_text(size = rel(1.2)),
                              axis.title.y = element_text(size = rel(1.2))) +
-                       ggtitle("(c)"),
+                       ggtitle("(c)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig2d +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.2)),
                              axis.text.x = element_text(size = rel(1.2)),
                              axis.text.y = element_text(size = rel(1.2)),
                              axis.title.y = element_text(size = rel(1.2))) +
-                       ggtitle("(d)"),
+                       ggtitle("(d)") +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      fig2e +
                        theme(legend.position = "none",
                              axis.title.x = element_text(size = rel(1.2)),
                              axis.text.x = element_text(size = rel(1.2)),
                              axis.text.y = element_text(size = rel(1.2)),
                              axis.title.y = element_text(size = rel(1.2))) +
-                       ggtitle("(e)"),
+                       ggtitle("(e)")  +
+                       annotate("text",  
+                                x = Inf, 
+                                y = Inf, 
+                                label = "*", 
+                                vjust = 1, 
+                                hjust = 1,
+                                size = rel(10)),
                      legend,
                      ncol = 2)
 ## Save figure

@@ -364,21 +364,29 @@ community_data <-
 # Get biomass
 community_data <-
   community_data %>%
-  hellometry::hello_metry()
+  hellometry::hellometry(level_list = c("bwg_name", "species", "genus",
+                                        "tribe", "subfamily", "family",
+                                        "subord", "ord", "subclass", "class"))
 
   
 # Explore data to confirm there is nothing wrong
-hist(as.numeric(community_data$size_original))
-hist(as.numeric(community_data$biomass_mg)) 
-unique(community_data$class)
-unique(community_data$ord)
-unique(community_data$family)
-unique(community_data$subfamily)
-unique(community_data$genus)
-unique(community_data$species)
+## Size estimations
+hist(community_data$size_estimations$size_mm)
+hist(community_data$data$size_mm)
+## Models
+community_data$model_estimations$model
+## Biomass estimations
+hist(community_data$data$biomass_mg)
+## Taxonomy
+unique(community_data$data$class)
+unique(community_data$data$ord)
+unique(community_data$data$family)
+unique(community_data$data$subfamily)
+unique(community_data$data$genus)
+unique(community_data$data$species)
 
 ## Save data
-readr::write_csv(community_data,
+readr::write_csv(community_data$data,
                  here::here("community_data.csv"))
 
 # Emerged -----------------------------------------------------------------

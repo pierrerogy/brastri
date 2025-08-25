@@ -284,7 +284,7 @@ axis_label <- function(parameter){
   # Invert decomposition - dry
   if(parameter == "invert_dry")
     ret <- 
-      "Poportion of mass loss \nto invertebrate decomposition"
+      "Proportion of mass loss \nto invertebrate decomposition"
   
   if(parameter == "coarse_normal")
     ret <- 
@@ -538,6 +538,8 @@ treatment_plot <- function(model, parameter, scale = "none", trini = F,
             dplyr::filter(country == "trini")}
   
   # Plot
+  ## General
+  if(scale != "chloroscale"){
   ret <- 
     ggplot(data = model_effect,
            aes(x = x2, 
@@ -566,7 +568,41 @@ treatment_plot <- function(model, parameter, scale = "none", trini = F,
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(),
           panel.background = element_blank(), 
-          axis.line = element_line(colour = "black"))
+          axis.line = element_line(colour = "black"))}
+    ## Chlorophyll is special
+  if(scale == "chloroscale"){
+    ret <- 
+      ggplot(data = model_effect,
+             aes(x = x2, 
+                 y = estimate__ + 0.001), 
+             colour = resource) + 
+      geom_point(size = 4,
+                 aes(colour = resource),
+                 position = position_dodge(0.5)) +
+      geom_errorbar(aes(ymin = lower__ + 0.001, 
+                        ymax = upper__ + 0.001,
+                        colour = resource), 
+                    width = 0.2,
+                    position = position_dodge(0.5)) +
+      geom_jitter(data = dats,
+                  aes(x = x2,
+                      y = y + 0.001,
+                      colour = resource,
+                      alpha = 0.3)) +
+      scale_y_continuous(trans = "log",
+                         breaks = c(0.001, 0.002, 0.1, 1),
+                         labels = c(0, 1, 1.1, 2.7)) +
+      ggtitle("") +
+      ylab(ylab) +
+      scale_x_discrete(labels = namevec) +
+      scale_color_manual(name = "Resource",
+                         labels = c("Control", "Enriched"), 
+                         values = c("tan1", "tan4")) +
+      guides(alpha="none") +
+      theme(panel.grid.major = element_blank(), 
+            panel.grid.minor = element_blank(),
+            panel.background = element_blank(), 
+            axis.line = element_line(colour = "black"))}
   
   # X axis depends on if site includes regua data or not
   if(!trini){
